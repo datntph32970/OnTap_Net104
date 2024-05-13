@@ -1,0 +1,83 @@
+﻿@model IEnumerable<OnTap_Net104.Models.CartDetail>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CartID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <input class="form-check-input" id="Status_@item.Id" type="checkbox" checked="@item.Status" onchange="update('@item.Id',@item.Quantity,this.checked)" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.ActionLink( item.ProductId.ToString(), "Details", new { Controller="Product",id = item.ProductId })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CartID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CartID)
+                </td>
+                <td>
+                                <input class="form-control mx-1" id="Quantity_@item.Id" style="max-width:35%" type="number" min="1" value="@item.Quantity" name="Quantity" onchange="update('@item.Id',this.value,'@item.Status')" />
+                </td>
+                <td>
+                    @* @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) | *@
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+        
+        <button class="btn btn-outline-danger" style="float:right">Thanh toán</button>
+</div>
+<script>
+    function update(id, quantity, status) {
+
+        $.ajax({
+            url: '/CartDetails/Edit',
+            type: 'POST',
+            data: { id: id, Quantity: quantity, Status: status },
+            success: function (data) {
+                // Xử lý kết quả thành công
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+</script>

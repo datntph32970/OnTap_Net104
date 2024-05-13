@@ -1,0 +1,36 @@
+﻿@model OnTap_Net104.Models.Account
+
+@{
+    ViewBag.Title = "SignUp";
+    Layout = "~/Views/Shared/_Layout_Login_SignUp.cshtml";
+}
+    <div class="background"></div>
+<div class="card shadow">
+        <img class="logo" src="~/image/boy.png">
+        <h2>Đăng ký tài khoản</h2>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <form class="form " asp-action="SignUp">
+            <input asp-for="Username" type="text" placeholder="Username" required>
+            <span asp-validation-for="Username" class="text-danger"></span>
+
+            <input asp-for="Phone" type="text" placeholder="Số điện thoại" required>
+            <span asp-validation-for="Phone" class="text-danger"></span>
+
+            <input asp-for="Address" type="text" placeholder="Địa chỉ" required>
+            <span asp-validation-for="Address" class="text-danger"></span>
+
+            <input asp-for="Password" type="password" placeholder="Password" required>
+
+            <button type="submit">Đăng ký</button>
+        </form>
+
+        <footer>
+            Bạn đã có tài khoản?
+            <a asp-controller="Account" asp-action="Login">Đăng nhập</a>
+        </footer>
+    </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
