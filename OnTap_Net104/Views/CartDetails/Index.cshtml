@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    AppDbContext db = new AppDbContext();
 }
 
 <h1>Index</h1>
@@ -32,7 +33,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr class="product_@item.Id">
                 <td>
                     <input class="form-check-input" id="Status_@item.Id" type="checkbox" checked="@item.Status" onchange="update('@item.Id',@item.Quantity,this.checked)" />
                 </td>
@@ -40,20 +41,21 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @Html.ActionLink( item.ProductId.ToString(), "Details", new { Controller="Product",id = item.ProductId })
+                    @Html.ActionLink(item.ProductId.ToString(), "Details", new { Controller = "Product", id = item.ProductId })
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CartID)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CartID)
+                    <div id="total_@item.Id">@(@db.Products.FirstOrDefault(a=>a.Id == item.ProductId).Price * @item.Quantity)</div>
+                    <span id="price_@item.Id" hidden >@db.Products.FirstOrDefault(a=>a.Id == item.ProductId).Price</span>
                 </td>
                 <td>
-                                <input class="form-control mx-1" id="Quantity_@item.Id" style="max-width:35%" type="number" min="1" value="@item.Quantity" name="Quantity" onchange="update('@item.Id',this.value,'@item.Status')" />
+                    <input class="form-control mx-1" id="Quantity_@item.Id" style="max-width:35%" type="number" min="1" max="@db.Products.FirstOrDefault(a=>a.Id == item.ProductId).Quantity" value="@item.Quantity" name="Quantity" onchange="update('@item.Id',this.value,'@item.Status')" />
                 </td>
                 <td>
                     @* @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) | *@
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) | *@
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                 </td>
             </tr>
@@ -61,23 +63,52 @@
     </tbody>
 </table>
 <div>
-        
-        <button class="btn btn-outline-danger" style="float:right">Thanh toán</button>
+    <button onclick="Pay()" class="btn btn-outline-danger" style="float:right">Thanh toán</button>
 </div>
 <script>
     function update(id, quantity, status) {
-
         $.ajax({
             url: '/CartDetails/Edit',
             type: 'POST',
             data: { id: id, Quantity: quantity, Status: status },
             success: function (data) {
-                // Xử lý kết quả thành công
+                var totalPriceElement = document.getElementById('total_' + id);
+                var priceElement = document.getElementById('price_' + id);
+                var price = parseFloat(priceElement.textContent);
+                totalPriceElement.textContent = (price * quantity).toFixed(2);
+
             },
             error: function (xhr, status, error) {
                 // Xử lý lỗi
             }
         });
     }
+    function Pay() {
+        $.ajax({
+            url: '/Bill/Create',
+            type: 'POST',
+            data: {},
+            success: function (data) {
+                var billId = data;
+                setTimeout(function () {
+                    $.ajax({
+                        url: '/BillDetails/Create',
+                        type: 'POST',
+                        data: { billID: billId },
+                        success: function (data) {
 
+                        },
+                        error: function (xhr, status, error) {
+                            // Xử lý lỗi
+                        }
+                    });
+                }, 3000);
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi
+            }
+        });
+
+        
+    }
 </script>

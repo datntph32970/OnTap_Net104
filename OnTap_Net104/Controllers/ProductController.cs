@@ -36,6 +36,7 @@ namespace OnTap_Net104.Controllers
                 throw;
             }
         }
+
         public IActionResult Details(Guid id)
         {
             var product = _db.Products.Find(id);
@@ -56,6 +57,7 @@ namespace OnTap_Net104.Controllers
                 product_db.Name = product.Name;
                 product_db.Price = product.Price;
                 product_db.Description = product.Description;
+                product_db.Quantity = product.Quantity;
                 product_db.Status = product.Status;
 
                 _db.Products.Update(product_db);

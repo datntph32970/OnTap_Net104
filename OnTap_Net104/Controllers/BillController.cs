@@ -16,23 +16,24 @@ namespace OnTap_Net104.Controllers
             var bills = _db.Bills.ToList();
             return View(bills);
         }
-        public IActionResult Create()
-        {
-            return View();
-        }
         [HttpPost]
-        public IActionResult Create(Bill bill)
+        public IActionResult Create()
         {
             try
             {
+                var bill = new Bill();
+
                 bill.Id = Guid.NewGuid().ToString(); 
                 bill.Username = HttpContext.Session.GetString("currentUsername");
+                bill.CreateDate = DateTime.Now;
+                bill.TotalBill = 0;
+                bill.Status = 0;
 
                 HttpContext.Session.SetString("currentBill", JsonConvert.SerializeObject(bill.Id));
 
                 _db.Bills.Add(bill);
                 _db.SaveChanges();
-                return RedirectToAction("Index");
+                return Json(bill.Id);
             }
             catch (Exception e)
             {

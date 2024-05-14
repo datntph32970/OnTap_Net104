@@ -15,20 +15,35 @@ namespace OnTap_Net104.Controllers
             var billDetails = _db.BillDetails.ToList();
             return View(billDetails);
         }
-        public IActionResult Create()
-        {
-            return View();
-        }
         [HttpPost]
-        public IActionResult Create(BillDetail billDetail)
+        public IActionResult Create(string billID)
         {
             try
             {
-                billDetail.Id = Guid.NewGuid();
-                billDetail.BillId = HttpContext.Session.GetString("currentBill");
+                var listProduct_Cart_True = _db.CartDetails.Where(a => a.CartID == HttpContext.Session.GetString("currentUsername") && a.Status == true).ToList();
+                foreach (var item in listProduct_Cart_True)
+                {
+                    var newBillDetail = new BillDetail()
+                    {
+                        Id = Guid.NewGuid(),
+                        BillId = billID,
+                        ProductId = item.ProductId,
+                        ProductPrice = _db.Products.Find(item.ProductId).Price,
+                        Quantity = item.Quantity,
+                        Status = 0
+                    };
 
-                _db.BillDetails.Add(billDetail);
-                _db.SaveChanges();
+                    _db.BillDetails.Add(newBillDetail);
+                    var updateProduct = _db.Products.Find(item.ProductId);
+                    updateProduct.Quantity -= item.Quantity;
+                    _db.Products.Update(updateProduct);
+
+                    var updateTotalBill = _db.Bills.Find(billID);
+                    updateTotalBill.TotalBill += newBillDetail.ProductPrice * newBillDetail.Quantity;
+                    _db.Bills.Update(updateTotalBill);
+
+                    _db.SaveChanges();
+                }
                 return RedirectToAction("Index");
             }
             catch (Exception e)
