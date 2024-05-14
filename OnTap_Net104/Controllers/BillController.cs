@@ -29,8 +29,6 @@ namespace OnTap_Net104.Controllers
                 bill.TotalBill = 0;
                 bill.Status = 0;
 
-                HttpContext.Session.SetString("currentBill", JsonConvert.SerializeObject(bill.Id));
-
                 _db.Bills.Add(bill);
                 _db.SaveChanges();
                 return Json(bill.Id);
