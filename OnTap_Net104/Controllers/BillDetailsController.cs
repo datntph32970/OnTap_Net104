@@ -10,17 +10,26 @@ namespace OnTap_Net104.Controllers
         {
             _db = new AppDbContext();
         }
-        public IActionResult Index()
+        public IActionResult Index(string id)
         {
-            var billDetails = _db.BillDetails.ToList();
-            return View(billDetails);
+            if(id == null)
+            {
+                var billDetails = _db.BillDetails.ToList();
+                return View(billDetails);
+            }
+            else
+            {
+                var billDetails = _db.BillDetails.Where(a=>a.BillId == id).ToList();
+                return View(billDetails);
+            }
         }
         [HttpPost]
-        public IActionResult Create(string billID)
+        public IActionResult Create(string billID )
         {
             try
             {
-                var listProduct_Cart_True = _db.CartDetails.Where(a => a.CartID == HttpContext.Session.GetString("currentUsername") && a.Status == true).ToList();
+                  var listProduct_Cart_True = _db.CartDetails.Where(a => a.CartID == HttpContext.Session.GetString("currentUsername") && a.Status == true).ToList();
+          
                 foreach (var item in listProduct_Cart_True)
                 {
                     var newBillDetail = new BillDetail()
@@ -42,9 +51,12 @@ namespace OnTap_Net104.Controllers
                     updateTotalBill.TotalBill += newBillDetail.ProductPrice * newBillDetail.Quantity;
                     _db.Bills.Update(updateTotalBill);
 
+                    _db.CartDetails.Remove(item);
+
                     _db.SaveChanges();
                 }
                 return RedirectToAction("Index");
+                    
             }
             catch (Exception e)
             {

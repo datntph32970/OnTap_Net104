@@ -1,0 +1,98 @@
+﻿@model IEnumerable<OnTap_Net104.Models.Bill>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalBill)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalBill)
+                </td>
+                <td>
+                    @if (item.Status == 0)
+                    {
+                        <span class="bg-warning text-black p-1 rounded-1 fw-medium shadow-sm"  id="status_0_@item.Id" >Đang chờ xác nhận</span>
+                    }
+                    else if (item.Status == 1)
+                    {
+                        <span class="bg-success text-light p-1 rounded-1 fw-medium shadow-sm" id="status_1_@item.Id">Đã xác nhận</span>
+                    }
+                    else if (item.Status == 2)
+                    {
+                        <span class="bg-danger text-light p-1 rounded-1 fw-medium shadow-sm" id="status_2_@item.Id">Đã hủy đơn hàng</span>
+                    }
+                    <span id="StatusBill_@item.Id" hidden>@item.Status</span>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateDate)
+                </td>
+                <td>
+                    <button class="btn btn-outline-success" onclick="Update('@item.Id',1)" @(item.Status == 2 ||item.Status == 1 ? "disabled" : "")>Xác nhận</button>
+                </td>
+                <td>
+                    <button class="btn btn-outline-danger" onclick="Update('@item.Id',2)" @(item.Status == 1 || item.Status ==2? "disabled" : "")>Hủy đơn hàng</button>
+                </td>
+                <td>
+                    <a asp-action="Index" asp-controller="BillDetails" asp-route-id="@item.Id"><i class="fa-regular fa-square-plus fa-xl align-middle"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    function Update(id, status) {
+        $.ajax({
+            url: '/Bill/Update',
+            type: 'POST',
+            data: { id: id, status: status },
+            success: function (res) {
+                if (status == 2) {
+                    toastr.success('Đã hủy thành công 1 đơn hàng!', 'Thành công');
+                }
+                else if (status == 1) {
+                    toastr.success('Đã Xác nhận thành công 1 đơn hàng!', 'Thành công');
+                }
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function (xhr, status, error) {
+                toastr.error('Có lỗi xảy ra, vui lòng thử lại!', 'Thất bại');
+            }
+        });
+    }
+</script>

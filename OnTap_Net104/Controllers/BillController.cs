@@ -13,7 +13,12 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Index()
         {
-            var bills = _db.Bills.ToList();
+            var bills = _db.Bills.OrderByDescending(bill => bill.CreateDate).ToList();
+            return View(bills);
+        }
+        public IActionResult Index_ViewKhachHang(string username)
+        {
+            var bills = _db.Bills.Where(bill => bill.Username == username).OrderByDescending(bill => bill.CreateDate).ToList();
             return View(bills);
         }
         [HttpPost]
@@ -44,12 +49,23 @@ namespace OnTap_Net104.Controllers
             var bill = _db.Bills.Find(id);
             return View(bill);
         }
-        public IActionResult Delete (string id)
+        public IActionResult Update (string id,int status)
         {
             try
             {
+                if(status == 2)
+                {
+                    var listProduct = _db.BillDetails.Where(x => x.BillId == id).ToList();
+                    foreach (var item in listProduct)
+                    {
+                        var product = _db.Products.Find(item.ProductId);
+                        product.Quantity += item.Quantity;
+                        _db.Products.Update(product);
+                    }
+                }
                 var bill = _db.Bills.Find(id);
-                _db.Bills.Remove(bill);
+                bill.Status = status;
+                _db.Bills.Update(bill);
                 _db.SaveChanges();
                 return RedirectToAction("Index");
             }

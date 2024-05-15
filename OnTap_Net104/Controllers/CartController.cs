@@ -15,6 +15,7 @@ namespace OnTap_Net104.Controllers
             var carts = _db.Carts.ToList();
             return View(carts);
         }
+
         public IActionResult Edit(string username)
         {
             var cart = _db.Carts.Find(username);

@@ -63,41 +63,65 @@
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                 </td>
                 <td>
-                    @using (Html.BeginForm("Create", "CartDetails", FormMethod.Post))
-                    {
-                        @Html.Hidden("ProductID", item.Id)
                         <div class="d-flex">
                             <div class="form-control mx-1" style="border:none; min-width:230px">
                                 <input type="number" name="Quatity" id="CartQuatity_@item.Id" class="form-control mx-1" min="1"  max="@item.Quantity" onchange="CheckQuantity('@item.Id','@item.Quantity',this.value)" />
                                 <span class="text-danger error_@item.Id" hidden>Vui lòng nhập số lượng hợp lệ!</span>
                             </div>
 
-                            <button type="submit" class="btn btn-warning buutton_@item.Id" disabled>Add to Cart</button>
+                            <button type="submit" class="btn btn-warning button_@item.Id" onclick="addToCart('@item.Id')" disabled>Add to Cart</button>
                         </div>
-                    }
                 </td>
             </tr>
         }
     </tbody>
-
 </table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     function CheckQuantity(itemId, productQuantityValue, cartQuantityValue) {
-        console.log(itemId, productQuantityValue, cartQuantityValue);
+        
+        var slSP = parseInt(productQuantityValue);
+        var slCart = parseInt(cartQuantityValue);
+
+        console.log(itemId, slSP, slCart);
 
         var errorSpan = document.querySelector(".error_" + itemId);
-        var buttonAddtoCart = document.querySelector(".buutton_" + itemId);
+        var buttonAddtoCart = document.querySelector(".button_" + itemId);
 
-        if (cartQuantityValue < 1 || cartQuantityValue > productQuantityValue) {
-            console.log("hiện")
-            errorSpan.hidden = false; 
-            buttonAddtoCart.disabled = true; 
+        if (slCart <= slCart && slCart > 0) {
 
-        } else {
             console.log("ẩn")
-            errorSpan.hidden = true; 
-            buttonAddtoCart.disabled = false; 
+            console.log(itemId, slCart + " >= " + slCart);
+            errorSpan.hidden = true;
+            buttonAddtoCart.disabled = false;
 
+
+        } else if (slCart > slCart || slCart < 1) {
+            
+            console.log("hiện")
+            console.log(itemId, slCart + " < " + slCart);
+
+            errorSpan.hidden = false;
+            buttonAddtoCart.disabled = true;
         }
+    }
+    function addToCart(productId) {
+        var quantity = document.getElementById("CartQuatity_" + productId).value;
+
+        $.ajax({
+            url: '/CartDetails/Create',  
+            type: 'POST',
+            data: { ProductID: productId, Quatity: quantity },
+            success: function (data) {
+                    toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function (xhr, status, error) {
+                toastr.error('Có lỗi xảy ra, vui lòng thử lại!', 'Thất bại');
+            }
+        });
     }
 </script>
