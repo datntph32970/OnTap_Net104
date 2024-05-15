@@ -17,6 +17,7 @@ namespace OnTap_Net104.Controllers
             if (!string.IsNullOrEmpty(listProductMuaLai))
             {
                 var listProductMuaLaiJson = JsonConvert.DeserializeObject<List<CartDetail>>(listProductMuaLai);
+
                 foreach (var item in listProductMuaLaiJson)
                 {
                     var cartDetailToRemove = _db.CartDetails.FirstOrDefault(cd => cd.Id == item.Id);
