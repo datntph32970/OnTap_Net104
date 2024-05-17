@@ -88,28 +88,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     function update(id, quantity, status) {
+
         var productQuantity = document.getElementById('productQuatity_' + id);
         var productQuantityValue = parseInt(productQuantity.textContent)
+
+        var CartQuantity = document.getElementById('Quantity_' + id);
         var errorQuatity = document.getElementById('error_' + id);
         var buttonPay = document.getElementById('buttonPay');
 
         if (quantity < 0 || quantity > productQuantityValue) {
             errorQuatity.hidden = false;
             buttonPay.disabled = true;
+            console.log(quantity+"< 0 || "+quantity+'>'+productQuantityValue)
+
             return;
         }
         else {
             errorQuatity.hidden = true;
             buttonPay.disabled = false;
+            console.log(quantity + "> 0 && " + quantity + '<' + productQuantityValue)
         }
-
-        if (errorQuatity.hidden = false) {
-            buttonPay.disabled = true;
-        }
-        else {
-            buttonPay.disabled = false;
-        }
-
+ 
         $.ajax({
             url: '/CartDetails/Edit',
             type: 'POST',
@@ -120,6 +119,7 @@
                 var price = parseFloat(priceElement.textContent);
                 totalPriceElement.textContent = (price * quantity).toFixed(2);
 
+                CartQuantity.value = quantity;
             },
             error: function (xhr, status, error) {
                 // Xử lý lỗi
@@ -132,25 +132,29 @@
             type: 'POST',
             data: {},
             success: function (data) {
-
-                var billId = data;
-                $.ajax({
-                    url: '/BillDetails/Create',
-                    type: 'POST',
-                    data: { billID: billId },
-                    success: function (data) {
-                        toastr.success('Thanh toán thành công', 'Success');
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1500);
-                    },
-                    error: function (xhr, status, error) {
-                        toastr.error('Có lỗi xảy ra vui lòng thử lại!', 'Error');
-                    }
-                });
+                console.log(data);
+                if (data == "Không có sản phẩm nào được chọn" || data == "Có sản phẩm vượt quá số lượng vui lòng thử lại!") {
+                    toastr.error(data, 'Lỗi');
+                } else {
+                    var billId = data;
+                    $.ajax({
+                        url: '/BillDetails/Create',
+                        type: 'POST',
+                        data: { billID: billId },
+                        success: function (data) {
+                            toastr.success('Thanh toán thành công', 'Success');
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1500);
+                        },
+                        error: function (xhr, status, error) {
+                            toastr.error('Có lỗi xảy ra khi tạo BillDetails vui lòng thử lại!', 'Error');
+                        }
+                    });
+                }
             },
             error: function (xhr, status, error) {
-                toastr.error('Có lỗi xảy ra vui lòng thử lại!', 'Error');
+                toastr.error('Có lỗi xảy ra khi tạo Bill vui lòng thử lại!', 'Error');
             }
         });
 

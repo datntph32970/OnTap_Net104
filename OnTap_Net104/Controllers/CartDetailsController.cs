@@ -13,26 +13,8 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Index(string id)
         {
-            var listProductMuaLai = HttpContext.Session.GetString("listProductMuaLai");
-            if (!string.IsNullOrEmpty(listProductMuaLai))
-            {
-                var listProductMuaLaiJson = JsonConvert.DeserializeObject<List<CartDetail>>(listProductMuaLai);
-
-                foreach (var item in listProductMuaLaiJson)
-                {
-                    var cartDetailToRemove = _db.CartDetails.FirstOrDefault(cd => cd.Id == item.Id);
-                    if (cartDetailToRemove != null)
-                    {
-                        _db.CartDetails.Remove(cartDetailToRemove);
-                    }
-                }
-                _db.SaveChanges();
-            }
-
             if (id == null)
             {
-               
-
                 var username = HttpContext.Session.GetString("currentUsername");
                 var cartDetails = _db.CartDetails.Where(a => a.CartID == username).ToList();
                 return View(cartDetails);
@@ -49,14 +31,14 @@ namespace OnTap_Net104.Controllers
             try
             {
                 var username = HttpContext.Session.GetString("currentUsername");
-                if(username == null)
+                if (username == null)
                 {
                     return RedirectToAction("Login", "Account");
                 }
                 else
                 {
                     var existCartDetail = _db.CartDetails.Where(a => a.CartID == username && a.ProductId == ProductID).FirstOrDefault();
-                    if(existCartDetail != null)
+                    if (existCartDetail != null)
                     {
                         try
                         {
@@ -113,8 +95,6 @@ namespace OnTap_Net104.Controllers
                     cartDetail.Status = false;
 
                     listProductMuaLai.Add(cartDetail);
-                    _db.CartDetails.Add(cartDetail);
-                    _db.SaveChanges();
                 }
 
                 var a = JsonConvert.SerializeObject(listProductMuaLai);
@@ -126,7 +106,7 @@ namespace OnTap_Net104.Controllers
                 Console.WriteLine(e.InnerException.Message, e.Message);
                 throw;
             }
-            
+
         }
         public IActionResult View_MuaLai()
         {
@@ -156,17 +136,29 @@ namespace OnTap_Net104.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Guid id,int Quantity,bool Status)
+        public IActionResult Edit(Guid id, int Quantity, bool Status)
         {
             try
             {
                 var cartDetail_db = _db.CartDetails.Find(id);
+                if (cartDetail_db == null)
+                {
+                    var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
+                    cartDetail_db = listProductMuaLai.FirstOrDefault(a => a.Id == id);
+                    cartDetail_db.Quantity = Quantity;
+                    cartDetail_db.Status = Status;
 
-                cartDetail_db.Quantity = Quantity;
-                cartDetail_db.Status = Status;
+                    HttpContext.Session.SetString("listProductMuaLai", JsonConvert.SerializeObject(listProductMuaLai));
+                }
+                else
+                {
+                    cartDetail_db.Quantity = Quantity;
+                    cartDetail_db.Status = Status;
 
-                _db.CartDetails.Update(cartDetail_db);
-                _db.SaveChanges();
+                    _db.CartDetails.Update(cartDetail_db);
+                    _db.SaveChanges();
+                }
+
                 return RedirectToAction("Index");
             }
             catch (Exception e)

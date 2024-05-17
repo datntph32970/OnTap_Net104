@@ -22,13 +22,33 @@ namespace OnTap_Net104.Controllers
             return View(bills);
         }
         [HttpPost]
-        public IActionResult Create()
+        public IActionResult Create(bool isMuaLai)
         {
             try
             {
+                List<CartDetail> listProduct_Cart_True;
+                if (isMuaLai)
+                {
+                    listProduct_Cart_True = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
+                }
+                else
+                {
+                    listProduct_Cart_True = _db.CartDetails.Where(a => a.CartID == HttpContext.Session.GetString("currentUsername") && a.Status == true).ToList();
+                }
+                if (listProduct_Cart_True.Count == 0)
+                {
+                    return Json("Không có sản phẩm nào được chọn");
+                }
+                foreach (var item in listProduct_Cart_True)
+                {
+                    if ((item.Quantity > _db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity || item.Quantity < 1) && item.Status == true)
+                    {
+                        return Json("Có sản phẩm vượt quá số lượng vui lòng thử lại!");
+                    }
+                }
                 var bill = new Bill();
 
-                bill.Id = Guid.NewGuid().ToString(); 
+                bill.Id = Guid.NewGuid().ToString();
                 bill.Username = HttpContext.Session.GetString("currentUsername");
                 bill.CreateDate = DateTime.Now;
                 bill.TotalBill = 0;
@@ -36,6 +56,7 @@ namespace OnTap_Net104.Controllers
 
                 _db.Bills.Add(bill);
                 _db.SaveChanges();
+
                 return Json(bill.Id);
             }
             catch (Exception e)
@@ -49,11 +70,11 @@ namespace OnTap_Net104.Controllers
             var bill = _db.Bills.Find(id);
             return View(bill);
         }
-        public IActionResult Update (string id,int status)
+        public IActionResult Update(string id, int status)
         {
             try
             {
-                if(status == 2)
+                if (status == 2)
                 {
                     var listProduct = _db.BillDetails.Where(x => x.BillId == id).ToList();
                     foreach (var item in listProduct)
@@ -74,7 +95,7 @@ namespace OnTap_Net104.Controllers
                 Console.WriteLine(e.InnerException.Message, e.Message);
                 throw;
             }
-            
+
         }
     }
 }
