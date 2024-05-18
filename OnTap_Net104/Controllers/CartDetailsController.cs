@@ -37,12 +37,17 @@ namespace OnTap_Net104.Controllers
                 }
                 else
                 {
+                    
                     var existCartDetail = _db.CartDetails.Where(a => a.CartID == username && a.ProductId == ProductID).FirstOrDefault();
                     if (existCartDetail != null)
                     {
                         try
                         {
                             existCartDetail.Quantity += Quatity;
+                            if ((Quatity < 1) || (existCartDetail.Quantity > _db.Products.Find(ProductID).Quantity))
+                            {
+                                return Json("Số lượng trong giỏ hàng không thể quá số lượng trong kho!");
+                            }
                             _db.CartDetails.Update(existCartDetail);
                             _db.SaveChanges();
                             return RedirectToAction("Index");
@@ -55,6 +60,10 @@ namespace OnTap_Net104.Controllers
                     }
                     else
                     {
+                        if ((Quatity < 1) || (Quatity > _db.Products.Find(ProductID).Quantity))
+                        {
+                            return Json("Số lượng vượt quá số lượng trong kho!");
+                        }
                         var cartDetail = new CartDetail();
                         cartDetail.Id = Guid.NewGuid();
                         cartDetail.CartID = username;

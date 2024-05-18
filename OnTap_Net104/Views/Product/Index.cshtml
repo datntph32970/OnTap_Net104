@@ -110,10 +110,14 @@
         var quantity = document.getElementById("CartQuatity_" + productId).value;
 
         $.ajax({
-            url: '/CartDetails/Create',  
+            url: '/CartDetails/Create',
             type: 'POST',
             data: { ProductID: productId, Quatity: quantity },
             success: function (data) {
+                if (data == "Số lượng trong giỏ hàng không thể quá số lượng trong kho!" || data == "Số lượng vượt quá số lượng trong kho!") {
+                    toastr.error(data, 'Thất bại');
+                    return;
+                };
                     toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
                 setTimeout(function () {
                     window.location.reload();
