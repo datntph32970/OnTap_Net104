@@ -37,7 +37,7 @@
         {
             <tr class="product_@item.Id">
                 <td>
-                    <input class="form-check-input" id="Status_@item.Id" type="checkbox" checked="@item.Status" onchange="update('@item.Id',@item.Quantity,this.checked)" disabled="@(item.Quantity > db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity ? true : false)" />
+                    <input class="form-check-input" id="Status_@item.Id" type="checkbox" checked="@item.Status" onchange="update('@item.Id',document.getElementById('Quantity_@item.Id').value,this.checked)" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Id)
@@ -54,7 +54,7 @@
                     <span id="productQuatity_@item.Id" hidden>@db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity</span>
                 </td>
                 <td>
-                    <input class="form-control mx-1" id="Quantity_@item.Id" style="min-width:200px" type="number" min="1" max="@db.Products.FirstOrDefault(a=>a.Id == item.ProductId).Quantity" value="@item.Quantity" name="Quantity" onchange="update('@item.Id',this.value,'@item.Status')" />
+                    <input class="form-control mx-1" id="Quantity_@item.Id" style="min-width:200px" type="number" min="1" max="@db.Products.FirstOrDefault(a=>a.Id == item.ProductId).Quantity" value="@item.Quantity" name="Quantity" onchange="update('@item.Id',this.value,document.getElementById('Status_@item.Id').checked)" />
                     <span class="text-danger" id="error_@item.Id" hidden="@(item.Quantity > db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity ? false : true)">Không đủ số lượng</span>
                 </td>
                 <td>
@@ -87,6 +87,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     function update(id, quantity, status) {
+
         var productQuantity = document.getElementById('productQuatity_' + id);
         var productQuantityValue = parseInt(productQuantity.textContent)
 
@@ -118,6 +119,7 @@
                 totalPriceElement.textContent = (price * quantity).toFixed(2);
 
                 CartQuantity.value = quantity;
+                console.log(quantity, productQuantityValue, status)
             },
             error: function (xhr, status, error) {
                 // Xử lý lỗi

@@ -29,7 +29,8 @@ namespace OnTap_Net104.Controllers
                 List<CartDetail> listProduct_Cart_True;
                 if (isMuaLai)
                 {
-                    listProduct_Cart_True = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
+                    var listProduct_Cart = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
+                    listProduct_Cart_True = listProduct_Cart.Where(a => a.Status == true).ToList();
                 }
                 else
                 {
