@@ -13,11 +13,19 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("currentUsername") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
             var bills = _db.Bills.OrderByDescending(bill => bill.CreateDate).ToList();
             return View(bills);
         }
         public IActionResult Index_ViewKhachHang(string username)
         {
+            if(HttpContext.Session.GetString("currentUsername") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
             var bills = _db.Bills.Where(bill => bill.Username == username).OrderByDescending(bill => bill.CreateDate).ToList();
             return View(bills);
         }

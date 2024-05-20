@@ -13,6 +13,11 @@ namespace OnTap_Net104.Controllers
         {
             _db = new AppDbContext();
         }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("currentUsername");
+            return RedirectToAction("Login");
+        }
         public IActionResult Login(string username, string password)
         {
             try
@@ -78,6 +83,10 @@ namespace OnTap_Net104.Controllers
       
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("currentUsername") == null)
+            {
+                return RedirectToAction("Login");
+            }
             var accounts = _db.Accounts.ToList();
             return View(accounts);
         }

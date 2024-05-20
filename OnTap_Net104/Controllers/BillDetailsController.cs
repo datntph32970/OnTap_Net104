@@ -13,6 +13,13 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Index(string id)
         {
+            if(HttpContext.Session.GetString("currentUsername") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            else
+            {
+
             if (id == null)
             {
                 var billDetails = _db.BillDetails.ToList();
@@ -22,6 +29,7 @@ namespace OnTap_Net104.Controllers
             {
                 var billDetails = _db.BillDetails.Where(a => a.BillId == id).ToList();
                 return View(billDetails);
+            }
             }
         }
         [HttpPost]

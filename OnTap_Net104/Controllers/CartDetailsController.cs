@@ -13,6 +13,8 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Index(string id)
         {
+            
+
             if (id == null)
             {
                 var username = HttpContext.Session.GetString("currentUsername");
@@ -33,7 +35,7 @@ namespace OnTap_Net104.Controllers
                 var username = HttpContext.Session.GetString("currentUsername");
                 if (username == null)
                 {
-                    return RedirectToAction("Login", "Account");
+                    return Json("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
                 }
                 else
                 {
