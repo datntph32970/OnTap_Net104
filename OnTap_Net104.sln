@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnTap_Net104", "OnTap_Net104\OnTap_Net104.csproj", "{FCC39F64-0164-415E-8737-5278C1F70D29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnTap_Net104", "OnTap_Net104\OnTap_Net104.csproj", "{FCC39F64-0164-415E-8737-5278C1F70D29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAPI", "AppAPI\AppAPI.csproj", "{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FCC39F64-0164-415E-8737-5278C1F70D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCC39F64-0164-415E-8737-5278C1F70D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCC39F64-0164-415E-8737-5278C1F70D29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
