@@ -20,7 +20,7 @@ namespace OnTap_Net104.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var listBill = client.GetStringAsync("Bill/get-all").Result;
+            var listBill = client.GetStringAsync("APIBill/get-all").Result;
             var data = JsonConvert.DeserializeObject<List<Bill>>(listBill);
             return View(data);
             
@@ -31,14 +31,35 @@ namespace OnTap_Net104.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var bills = client.GetAsync($"Bill/get-by-id?id={username}").Result.Content.ReadAsStringAsync().Result;
-            return View(bills);
+            var listBill = client.GetStringAsync("APIBill/get-all").Result;
+            var data = JsonConvert.DeserializeObject<List<Bill>>(listBill).Where(a => a.Username == HttpContext.Session.GetString("currentUsername"));
+            return View(data);
         }
         [HttpPost]
         public IActionResult Create()
         {
             try
             {
+                var isHaveProductStatusTrue = client.GetStringAsync("CartDetails/get-all").Result;
+                var dataIsHaveProductStatusTrue = JsonConvert.DeserializeObject<List<CartDetail>>(isHaveProductStatusTrue).Where(a => a.Status == true && a.CartID == HttpContext.Session.GetString("currentUsername")).ToList();
+
+                if (dataIsHaveProductStatusTrue.Count == 0)
+                {
+                    return Json("Không có sản phẩm nào được chọn");
+                }
+                else
+                {
+                    foreach (var item in dataIsHaveProductStatusTrue)
+                    {
+                        var product = client.GetStringAsync($"SanPham/get-by-id?id={item.ProductId}").Result;
+                        var dataProduct = JsonConvert.DeserializeObject<Product>(product);
+                        if(item.Quantity > dataProduct.Quantity)
+                        {
+                            return Json("Có sản phẩm vượt quá số lượng vui lòng thử lại!");
+                        }
+                    }
+                }
+
                 var bill = new Bill();
                 bill.Id = Guid.NewGuid().ToString();
                 bill.Username = HttpContext.Session.GetString("currentUsername");
@@ -49,23 +70,23 @@ namespace OnTap_Net104.Controllers
                 var json = JsonConvert.SerializeObject(bill);
 
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
-                var result = client.PostAsync("Bill/create", data).Result;
+                var result = client.PostAsync("APIBill/create", data).Result;
                 if (result.IsSuccessStatusCode)
                 {
                     return Json(bill.Id);
                 };
-                return BadRequest   ();
+                return BadRequest();
             }
           
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+                return BadRequest();
             }
         }
         public IActionResult Details(string id)
         {
-            var bill = client.GetAsync($"Bill/get-by-id?id={id}").Result.Content.ReadAsStringAsync().Result;
+            var bill = client.GetAsync($"APIBill/get-by-id?id={id}").Result.Content.ReadAsStringAsync().Result;
             return View(bill);
         }
         [HttpPost]
@@ -75,7 +96,7 @@ namespace OnTap_Net104.Controllers
             {
                 if (status == 2)
                 {
-                    var listBillDetails = client.GetStringAsync($"BillDetail/get-all").Result;
+                    var listBillDetails = client.GetStringAsync($"APIBillDetail/get-all").Result;
                     var datalistBillDetails = JsonConvert.DeserializeObject<List<BillDetail>>(listBillDetails);
 
                     foreach (var item in datalistBillDetails.Where(a => a.BillId == id).ToList())
@@ -90,12 +111,12 @@ namespace OnTap_Net104.Controllers
                     }
                 }
 
-                var bill = client.GetStringAsync($"Bill/get-by-id?id={id}").Result;
+                var bill = client.GetStringAsync($"APIBill/get-by-id?id={id}").Result;
                 var dataBill = JsonConvert.DeserializeObject<Bill>(bill);
 
                 dataBill.Status = status;
                 
-                var result = client.PutAsJsonAsync("Bill/update", dataBill).Result;
+                var result = client.PutAsJsonAsync("APIBill/update", dataBill).Result;
                 
                     return RedirectToAction("Index");
                 

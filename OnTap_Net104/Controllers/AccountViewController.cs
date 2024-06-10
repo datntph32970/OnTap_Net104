@@ -49,7 +49,7 @@ namespace OnTap_Net104.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+               return BadRequest();
             }
 
         }

@@ -5,30 +5,29 @@ namespace AppAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BillController : ControllerBase
+    public class APIBillDetailController : ControllerBase
     {
         OnTapC4Context _db;
-        public BillController()
+        public APIBillDetailController()
         {
             _db = new OnTapC4Context();
         }
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
-            return Ok(_db.Bills.ToList());
+            return Ok(_db.BillDetails.ToList());
         }
         [HttpGet("get-by-id")]
-        public IActionResult GetById(string id)
+        public IActionResult GetById(Guid id)
         {
-            return Ok(_db.Bills.Find(id));
+            return Ok(_db.BillDetails.Find(id));
         }
         [HttpPost("create")]
-        public IActionResult Create(Bill bill)
+        public IActionResult Create(BillDetail billDetail)
         {
             try
             {
-
-                _db.Bills.Add(bill);
+                _db.BillDetails.Add(billDetail);
                 _db.SaveChanges();
                 return Ok();
             }
@@ -37,40 +36,16 @@ namespace AppAPI.Controllers
 
                 return BadRequest();
             }
+            
         }
         [HttpPut("update")]
-        public IActionResult Update(Bill bill)
+        public IActionResult Update(BillDetail billDetail)
         {
             try
             {
-                var billUpdate = _db.Bills.Find(bill.Id);
-                billUpdate.Username = bill.Username;
-                billUpdate.TotalBill = bill.TotalBill;
-                billUpdate.Status = bill.Status;
-                billUpdate.CreateDate = bill.CreateDate;
-
-                _db.Bills.Update(billUpdate);
-                _db.SaveChanges();
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message,e.Message);
-                return BadRequest();
-            }
-           
-        }
-        [HttpDelete("delete")]
-        public IActionResult Delete(Guid id)
-        {
-            try
-            {
-                var bill = _db.Bills.Find(id);
-                _db.Bills.Remove(bill);
+                _db.BillDetails.Update(billDetail);
                 _db.SaveChanges();
                 return Ok();
-
             }
             catch (Exception)
             {
@@ -79,6 +54,24 @@ namespace AppAPI.Controllers
             }
            
         }
+        [HttpDelete("delete")]
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                var billDetail = _db.BillDetails.Find(id);
+                _db.BillDetails.Remove(billDetail);
+                _db.SaveChanges();
+                return Ok();
+            }
+            catch (Exception)
+            {
 
+                return BadRequest();
+            }
+            
+        }
+
+       
     }
 }
