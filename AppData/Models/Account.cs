@@ -16,4 +16,6 @@ public partial class Account
     public virtual ICollection<Bill> Bills { get; set; } = new List<Bill>();
 
     public virtual Cart? Cart { get; set; }
+
 }
+
