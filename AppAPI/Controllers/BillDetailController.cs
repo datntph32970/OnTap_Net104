@@ -13,14 +13,14 @@ namespace AppAPI.Controllers
             _db = new OnTapC4Context();
         }
         [HttpGet("get-all")]
-        public List<BillDetail> GetAll()
+        public IActionResult GetAll()
         {
-            return _db.BillDetails.ToList();
+            return Ok(_db.BillDetails.ToList());
         }
         [HttpGet("get-by-id")]
-        public BillDetail GetById(Guid id)
+        public IActionResult GetById(Guid id)
         {
-            return _db.BillDetails.Find(id);
+            return Ok(_db.BillDetails.Find(id));
         }
         [HttpPost("create")]
         public IActionResult Create(BillDetail billDetail)

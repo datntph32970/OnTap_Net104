@@ -20,7 +20,11 @@ namespace AppAPI.Controllers
         {
             return Ok(_context.Products.ToList());
         }
-
+        [HttpGet("get-by-id")]
+        public IActionResult GetById(Guid id)
+        {
+            return Ok(_context.Products.Find(id));
+        }
         // GET api/<SanPhamController>/5
         [HttpGet("Details")]
         public IActionResult Get(Guid id)

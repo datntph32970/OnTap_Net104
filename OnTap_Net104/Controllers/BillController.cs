@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OnTap_Net104.Models;
+using System.Text;
 
 namespace OnTap_Net104.Controllers
 {
     public class BillController : Controller
     {
-        AppDbContext _db;
+        HttpClient client;
         public BillController()
         {
-            _db = new AppDbContext();
+            client = new HttpClient();
+            client.BaseAddress = new Uri("https://localhost:7011/api/");
         }
         public IActionResult Index()
         {
@@ -17,8 +20,10 @@ namespace OnTap_Net104.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var bills = _db.Bills.OrderByDescending(bill => bill.CreateDate).ToList();
-            return View(bills);
+            var listBill = client.GetStringAsync("Bill/get-all").Result;
+            var data = JsonConvert.DeserializeObject<List<Bill>>(listBill);
+            return View(data);
+            
         }
         public IActionResult Index_ViewKhachHang(string username)
         {
@@ -26,48 +31,32 @@ namespace OnTap_Net104.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var bills = _db.Bills.Where(bill => bill.Username == username).OrderByDescending(bill => bill.CreateDate).ToList();
+            var bills = client.GetAsync($"Bill/get-by-id?id={username}").Result.Content.ReadAsStringAsync().Result;
             return View(bills);
         }
         [HttpPost]
-        public IActionResult Create(bool isMuaLai)
+        public IActionResult Create()
         {
             try
             {
-                List<CartDetail> listProduct_Cart_True;
-                if (isMuaLai)
-                {
-                    var listProduct_Cart = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
-                    listProduct_Cart_True = listProduct_Cart.Where(a => a.Status == true).ToList();
-                }
-                else
-                {
-                    listProduct_Cart_True = _db.CartDetails.Where(a => a.CartID == HttpContext.Session.GetString("currentUsername") && a.Status == true).ToList();
-                }
-                if (listProduct_Cart_True.Count == 0)
-                {
-                    return Json("Không có sản phẩm nào được chọn");
-                }
-                foreach (var item in listProduct_Cart_True)
-                {
-                    if ((item.Quantity > _db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity || item.Quantity < 1) && item.Status == true)
-                    {
-                        return Json("Có sản phẩm vượt quá số lượng vui lòng thử lại!");
-                    }
-                }
                 var bill = new Bill();
-
                 bill.Id = Guid.NewGuid().ToString();
                 bill.Username = HttpContext.Session.GetString("currentUsername");
-                bill.CreateDate = DateTime.Now;
                 bill.TotalBill = 0;
                 bill.Status = 0;
+                bill.CreateDate = new DateTime();
 
-                _db.Bills.Add(bill);
-                _db.SaveChanges();
+                var json = JsonConvert.SerializeObject(bill);
 
-                return Json(bill.Id);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                var result = client.PostAsync("Bill/create", data).Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    return Json(bill.Id);
+                };
+                return BadRequest   ();
             }
+          
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
@@ -76,33 +65,46 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Details(string id)
         {
-            var bill = _db.Bills.Find(id);
+            var bill = client.GetAsync($"Bill/get-by-id?id={id}").Result.Content.ReadAsStringAsync().Result;
             return View(bill);
         }
+        [HttpPost]
         public IActionResult Update(string id, int status)
         {
             try
             {
                 if (status == 2)
                 {
-                    var listProduct = _db.BillDetails.Where(x => x.BillId == id).ToList();
-                    foreach (var item in listProduct)
+                    var listBillDetails = client.GetStringAsync($"BillDetail/get-all").Result;
+                    var datalistBillDetails = JsonConvert.DeserializeObject<List<BillDetail>>(listBillDetails);
+
+                    foreach (var item in datalistBillDetails.Where(a => a.BillId == id).ToList())
                     {
-                        var product = _db.Products.Find(item.ProductId);
-                        product.Quantity += item.Quantity;
-                        _db.Products.Update(product);
+                        var product = client.GetStringAsync($"SanPham/get-by-id?id={item.ProductId}").Result;
+                        var dataProduct = JsonConvert.DeserializeObject<Product>(product);
+
+                        dataProduct.Quantity += item.Quantity;
+                        
+                       var respone =  client.PutAsync("SanPham/Edit", new StringContent(JsonConvert.SerializeObject(dataProduct), Encoding.UTF8, "application/json"));
+                       
                     }
                 }
-                var bill = _db.Bills.Find(id);
-                bill.Status = status;
-                _db.Bills.Update(bill);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+
+                var bill = client.GetStringAsync($"Bill/get-by-id?id={id}").Result;
+                var dataBill = JsonConvert.DeserializeObject<Bill>(bill);
+
+                dataBill.Status = status;
+                
+                var result = client.PutAsJsonAsync("Bill/update", dataBill).Result;
+                
+                    return RedirectToAction("Index");
+                
+                
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+                return BadRequest();
             }
 
         }

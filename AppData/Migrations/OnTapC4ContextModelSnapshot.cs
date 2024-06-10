@@ -39,7 +39,6 @@ namespace AppData.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Username");
@@ -59,16 +58,15 @@ namespace AppData.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalBill")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Username" }, "IX_Bills_Username");
+                    b.HasIndex("Username");
 
                     b.ToTable("Bills");
                 });
@@ -76,6 +74,7 @@ namespace AppData.Migrations
             modelBuilder.Entity("AppData.Models.BillDetail", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BillId")
@@ -86,7 +85,7 @@ namespace AppData.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("ProductPrice")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -96,9 +95,9 @@ namespace AppData.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "BillId" }, "IX_BillDetails_BillId");
+                    b.HasIndex("BillId");
 
-                    b.HasIndex(new[] { "ProductId" }, "IX_BillDetails_ProductId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("BillDetails");
                 });
@@ -106,7 +105,6 @@ namespace AppData.Migrations
             modelBuilder.Entity("AppData.Models.Cart", b =>
                 {
                     b.Property<string>("Username")
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
@@ -123,13 +121,12 @@ namespace AppData.Migrations
             modelBuilder.Entity("AppData.Models.CartDetail", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CartId")
+                    b.Property<string>("CartID")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("CartID");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -142,9 +139,9 @@ namespace AppData.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "CartId" }, "IX_CartDetails_CartID");
+                    b.HasIndex("CartID");
 
-                    b.HasIndex(new[] { "ProductId" }, "IX_CartDetails_ProductId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("CartDetails");
                 });
@@ -152,6 +149,7 @@ namespace AppData.Migrations
             modelBuilder.Entity("AppData.Models.Product", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -163,7 +161,7 @@ namespace AppData.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -178,13 +176,13 @@ namespace AppData.Migrations
 
             modelBuilder.Entity("AppData.Models.Bill", b =>
                 {
-                    b.HasOne("AppData.Models.Account", "UsernameNavigation")
+                    b.HasOne("AppData.Models.Account", "Account")
                         .WithMany("Bills")
                         .HasForeignKey("Username")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UsernameNavigation");
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("AppData.Models.BillDetail", b =>
@@ -208,21 +206,21 @@ namespace AppData.Migrations
 
             modelBuilder.Entity("AppData.Models.Cart", b =>
                 {
-                    b.HasOne("AppData.Models.Account", "UsernameNavigation")
+                    b.HasOne("AppData.Models.Account", "Account")
                         .WithOne("Cart")
                         .HasForeignKey("AppData.Models.Cart", "Username")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Cart_Account");
 
-                    b.Navigation("UsernameNavigation");
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("AppData.Models.CartDetail", b =>
                 {
                     b.HasOne("AppData.Models.Cart", "Cart")
                         .WithMany("CartDetails")
-                        .HasForeignKey("CartId")
+                        .HasForeignKey("CartID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -241,7 +239,8 @@ namespace AppData.Migrations
                 {
                     b.Navigation("Bills");
 
-                    b.Navigation("Cart");
+                    b.Navigation("Cart")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AppData.Models.Bill", b =>

@@ -13,20 +13,21 @@ namespace AppAPI.Controllers
             _db = new OnTapC4Context();
         }
         [HttpGet("get-all")]
-        public List<Bill> GetAll()
+        public IActionResult GetAll()
         {
-            return _db.Bills.ToList();
+            return Ok(_db.Bills.ToList());
         }
         [HttpGet("get-by-id")]
-        public Bill GetById(Guid id)
+        public IActionResult GetById(string id)
         {
-            return _db.Bills.Find(id);
+            return Ok(_db.Bills.Find(id));
         }
         [HttpPost("create")]
         public IActionResult Create(Bill bill)
         {
             try
             {
+
                 _db.Bills.Add(bill);
                 _db.SaveChanges();
                 return Ok();
@@ -42,14 +43,21 @@ namespace AppAPI.Controllers
         {
             try
             {
-                _db.Bills.Update(bill);
+                var billUpdate = _db.Bills.Find(bill.Id);
+                billUpdate.Username = bill.Username;
+                billUpdate.TotalBill = bill.TotalBill;
+                billUpdate.Status = bill.Status;
+                billUpdate.CreateDate = bill.CreateDate;
+
+                _db.Bills.Update(billUpdate);
                 _db.SaveChanges();
+
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-               return BadRequest();
+                Console.WriteLine(e.InnerException.Message,e.Message);
+                return BadRequest();
             }
            
         }

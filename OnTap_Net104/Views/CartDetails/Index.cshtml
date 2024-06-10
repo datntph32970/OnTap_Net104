@@ -1,5 +1,5 @@
 ﻿@using Newtonsoft.Json
-@model IEnumerable<OnTap_Net104.Models.CartDetail>
+@model IEnumerable<AppData.Models.CartDetail>
 
 @{
     ViewData["Title"] = "Index";
@@ -59,8 +59,7 @@
                     <span class="text-danger" id="error_@item.Id" hidden="@(item.Quantity > db.Products.FirstOrDefault(a => a.Id == item.ProductId).Quantity ? false : true)">Không đủ số lượng</span>
                 </td>
                 <td>
-                    @* @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) | *@
+                   
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                 </td>
             </tr>
@@ -71,19 +70,7 @@
     <button onclick="Pay()" class="btn btn-outline-danger" id="buttonPay" style="float:right">Thanh toán</button>
 </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <img src="..." class="rounded me-2" alt="...">
-            <strong class="me-auto">Bootstrap</strong>
-            <small>11 mins ago</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            Hello, world! This is a toast message.
-        </div>
-    </div>
-</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>

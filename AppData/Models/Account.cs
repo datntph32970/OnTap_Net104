@@ -1,21 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-namespace AppData.Models;
-
-public partial class Account
+namespace AppData.Models
 {
-    public string Username { get; set; } = null!;
+    public class Account
+    {
+        [Required]
+        [StringLength(50, MinimumLength =10, ErrorMessage ="Độ dài username phải từ 10 - 50 kí tự")]
+        [Key]
+        public string Username { get; set; }
 
-    public string Password { get; set; } = null!;
+        [Required]
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Độ dài password phải từ 6 - 50 kí tự")]
+        public string Password { get; set; }
 
-    public string Phone { get; set; } = null!;
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Số điện thoại không hợp lệ")]
+        [DisplayName("Số điện thoại")]
 
-    public string Address { get; set; } = null!;
+        public string Phone { get; set; }
+        [DisplayName("Địa chỉ")]
 
-    public virtual ICollection<Bill> Bills { get; set; } = new List<Bill>();
+        public string Address { get; set; }
+        public virtual Cart? Cart { get; set; }
+        public virtual List<Bill>? Bills { get; set; }
 
-    public virtual Cart? Cart { get; set; }
-
+    }
 }
-

@@ -21,8 +21,8 @@ namespace OnTap_Net104.Models
         [DisplayName("Địa chỉ")]
 
         public string Address { get; set; }
-        public virtual Cart Cart { get; set; }
-        public virtual List<Bill> Bills { get; set; }
+        public virtual Cart? Cart { get; set; }
+        public virtual List<Bill>? Bills { get; set; }
 
     }
 }
