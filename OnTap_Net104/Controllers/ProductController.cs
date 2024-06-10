@@ -1,89 +1,73 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AppData.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using OnTap_Net104.Models;
-
+using System.Net.WebSockets;
+using Product = AppData.Models.Product;
 namespace OnTap_Net104.Controllers
 {
     public class ProductController : Controller
     {
-        AppDbContext _db;
+        HttpClient _clitent;
+
         public ProductController()
         {
-            _db = new AppDbContext();
+            _clitent = new HttpClient();    
         }
         public IActionResult Index()
         {
-            var products = _db.Products.ToList();
-            return View(products);
+            var requetURL = $@"https://localhost:7011/api/SanPham/GetAll";
+            var reponse = _clitent.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<List<Product>>(reponse);
+            return View(data);
         }
         public IActionResult Create()
         {
+            Product product = new Product() 
+            { 
+            Id = Guid.NewGuid(),
+            Name = "Giay A",
+            Price = 20000,
+            Description = "Hay quas",
+            Status = 1,
+            Quantity = 20
+            };
             return View();
         }
         [HttpPost]
         public IActionResult Create(Product product)
         {
-            try
-            {
-                product.Id = Guid.NewGuid();
-                product.Status = 0;
-                _db.Products.Add(product);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/SanPham/Create";
+            var reponse = _clitent.PostAsJsonAsync(requetURL, product).Result;
+            return RedirectToAction("Index");
         }
 
         public IActionResult Details(Guid id)
         {
-            var product = _db.Products.Find(id);
-            return View(product);
+            var requetURL = $@"https://localhost:7011/api/SanPham/Details?id={id}";
+            var reponse = _clitent.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Product>(reponse);
+            return View(data);
         }
         public IActionResult Edit (Guid id)
         {
-            var product = _db.Products.Find(id);
-            return View(product);
+            var requetURL = $@"https://localhost:7011/api/SanPham/Details?id={id}";
+            var reponse = _clitent.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Product>(reponse);
+            return View(data);
         }
         [HttpPost]
         public IActionResult Edit(Product product)
         {
-            try
-            {
-                var product_db = _db.Products.Find(product.Id);
-
-                product_db.Name = product.Name;
-                product_db.Price = product.Price;
-                product_db.Description = product.Description;
-                product_db.Quantity = product.Quantity;
-                product_db.Status = product.Status;
-
-                _db.Products.Update(product_db);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/SanPham/Edit";
+            var reponse = _clitent.PutAsJsonAsync(requetURL, product).Result;
+            return RedirectToAction("Index");
         }
         public IActionResult Delete(Guid id)
         {
-            try
-            {
-                var product = _db.Products.Find(id);
-                _db.Products.Remove(product);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/SanPham/Delete?id={id}";
+            var reponse = _clitent.DeleteAsync(requetURL).Result;
+            return RedirectToAction("Index");
         }
     }
 }
