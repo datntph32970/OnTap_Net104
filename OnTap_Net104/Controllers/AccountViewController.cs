@@ -5,11 +5,11 @@ using OnTap_Net104.Models;
 
 namespace OnTap_Net104.Controllers
 {
-    public class AccountController : Controller
+    public class AccountViewController : Controller
     {
         AppDbContext _db;
         HttpClient _client;
-        public AccountController()
+        public AccountViewController()
         {
             _db = new AppDbContext();
             var handler = new HttpClientHandler();

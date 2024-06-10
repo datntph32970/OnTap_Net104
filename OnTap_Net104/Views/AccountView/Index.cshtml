@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AppData.Models.Account>
+﻿@model IEnumerable<OnTap_Net104.Models.Account>
 
 @{
     ViewData["Title"] = "Index";
@@ -45,7 +45,8 @@
             <td>
                     @Html.ActionLink("Edit", "Edit", new { username = item.Username })|
                     @Html.ActionLink("Details", "Details", new { username = item.Username }) |
-                    @Html.ActionLink("Delete", "Delete", new { username = item.Username })
+                    @Html.ActionLink("Delete", "Delete",  new { username = item.Username })
+
             </td>
         </tr>
 }

@@ -72,9 +72,9 @@ namespace AppAPI.Controllers
                 _db.SaveChanges();
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                Console.WriteLine(e.InnerException.Message, e.Message);
                 return BadRequest();
             }
         }
