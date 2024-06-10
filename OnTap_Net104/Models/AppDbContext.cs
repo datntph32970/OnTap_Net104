@@ -23,7 +23,7 @@ namespace OnTap_Net104.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=ACER\\SQLEXPRESS;Database=OnTapC4;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
+            optionsBuilder.UseSqlServer("Server=DESKTOP-0MDF18R\\SQLEXPRESS;Database=ASM_C4;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
