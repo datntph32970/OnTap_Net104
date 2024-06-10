@@ -51,6 +51,11 @@ namespace AppAPI.Controllers
             try
             {
                 var editItiems = _context.Products.Find(product.Id);
+                editItiems.Name = product.Name;
+                editItiems.Description = product.Description;
+                editItiems.Price = product.Price;
+                editItiems.Status = product.Status;
+                editItiems.Quantity = product.Quantity;
                 _context.Update(editItiems);
                 _context.SaveChanges();
                 return Ok();

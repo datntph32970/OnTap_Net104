@@ -23,7 +23,7 @@ namespace OnTap_Net104.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=ADMIN;Database=ASMC#5Net105;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
+            optionsBuilder.UseSqlServer("Server=ADMIN;Database=ASMCNET105;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

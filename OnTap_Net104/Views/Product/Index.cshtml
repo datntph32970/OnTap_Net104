@@ -1,4 +1,4 @@
-﻿@model IEnumerable<OnTap_Net104.Models.Product>
+﻿@model IEnumerable<AppData.Models.Product>
 
 @{
     ViewData["Title"] = "Index";
@@ -25,107 +25,41 @@
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-
-            <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
-            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td class="ProductQuantity_@item.Id">
-                    @Html.DisplayFor(modelItem => item.Quantity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                </td>
-                <td>
-                        <div class="d-flex">
-                            <div class="form-control mx-1" style="border:none; min-width:230px">
-                                <input type="number" name="Quatity" id="CartQuatity_@item.Id" class="form-control mx-1" min="1"  max="@item.Quantity" onchange="CheckQuantity('@item.Id','@item.Quantity',this.value)" />
-                                <span class="text-danger error_@item.Id" hidden>Vui lòng nhập số lượng hợp lệ!</span>
-                            </div>
-
-                            <button type="submit" class="btn btn-warning button_@item.Id" onclick="addToCart('@item.Id')" disabled>Add to Cart</button>
-                        </div>
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {  id=item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new {  id=item.Id })
+            </td>
+        </tr>
+}
     </tbody>
 </table>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script>
-    function CheckQuantity(itemId, productQuantityValue, cartQuantityValue) {
-        
-        var slSP = parseInt(productQuantityValue);
-        var slCart = parseInt(cartQuantityValue);
-
-        console.log(itemId, slSP, slCart);
-
-        var errorSpan = document.querySelector(".error_" + itemId);
-        var buttonAddtoCart = document.querySelector(".button_" + itemId);
-
-        if (slCart <= slCart && slCart > 0) {
-
-            console.log("ẩn")
-            console.log(itemId, slCart + " >= " + slCart);
-            errorSpan.hidden = true;
-            buttonAddtoCart.disabled = false;
-
-
-        } else if (slCart > slCart || slCart < 1) {
-            
-            console.log("hiện")
-            console.log(itemId, slCart + " < " + slCart);
-
-            errorSpan.hidden = false;
-            buttonAddtoCart.disabled = true;
-        }
-    }
-    function addToCart(productId) {
-        var quantity = document.getElementById("CartQuatity_" + productId).value;
-
-        $.ajax({
-            url: '/CartDetails/Create',
-            type: 'POST',
-            data: { ProductID: productId, Quatity: quantity },
-            success: function (data) {
-                if (data == "Số lượng trong giỏ hàng không thể quá số lượng trong kho!" || data == "Số lượng vượt quá số lượng trong kho!" || data == "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!") {
-                    toastr.error(data, 'Thất bại');
-                    return;
-                };
-                    toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
-                setTimeout(function () {
-                    window.location.reload();
-                }, 1500);
-            },
-            error: function (xhr, status, error) {
-                toastr.error('Có lỗi xảy ra, vui lòng thử lại!', 'Thất bại');
-            }
-        });
-    }
-</script>

@@ -1,9 +1,7 @@
 ﻿using AppData.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using OnTap_Net104.Models;
 using System.Net.WebSockets;
-using Product = AppData.Models.Product;
 namespace OnTap_Net104.Controllers
 {
     public class ProductController : Controller
@@ -12,7 +10,7 @@ namespace OnTap_Net104.Controllers
 
         public ProductController()
         {
-            _clitent = new HttpClient();    
+            _clitent = new HttpClient();
         }
         public IActionResult Index()
         {
@@ -23,16 +21,16 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Create()
         {
-            Product product = new Product() 
-            { 
-            Id = Guid.NewGuid(),
-            Name = "Giay A",
-            Price = 20000,
-            Description = "Hay quas",
-            Status = 1,
-            Quantity = 20
+            Product product = new Product()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Giay A",
+                Price = 20000,
+                Description = "Hay quas",
+                Status = 1,
+                Quantity = 20
             };
-            return View();
+            return View(product);
         }
         [HttpPost]
         public IActionResult Create(Product product)
@@ -49,7 +47,7 @@ namespace OnTap_Net104.Controllers
             var data = JsonConvert.DeserializeObject<Product>(reponse);
             return View(data);
         }
-        public IActionResult Edit (Guid id)
+        public IActionResult Edit(Guid id)
         {
             var requetURL = $@"https://localhost:7011/api/SanPham/Details?id={id}";
             var reponse = _clitent.GetStringAsync(requetURL).Result;

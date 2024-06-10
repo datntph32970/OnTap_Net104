@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AppData.Models;
 
-public partial class Product
+public class Product
 {
     public Guid Id { get; set; }
 
