@@ -8,10 +8,14 @@ namespace OnTap_Net104.Controllers
     public class AccountController : Controller
     {
         AppDbContext _db;
-
+        HttpClient _client;
         public AccountController()
         {
             _db = new AppDbContext();
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            _client = new HttpClient(handler);
+
         }
         public IActionResult Logout()
         {
@@ -80,28 +84,47 @@ namespace OnTap_Net104.Controllers
             }
 
         }
-      
+
+        [HttpGet]
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetString("currentUsername") == null)
+            var requetURL = $@"https://localhost:7011/api/Account/get-all";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<List<Account>>(reponse);
+            return View(data);
+        }
+        public IActionResult Create()
+        {
+            Account account = new Account()
             {
-                return RedirectToAction("Login");
+                Username = "thanhdx1234",
+                Password = "thanhdx1234",
+                Phone = "0796000234",
+                Address = "Ha Loi"
+            };
+            return View(account);
+        }
+        [HttpPost]
+        public IActionResult Create(Account account)
+        {
+            var acc = JsonConvert.SerializeObject(account);
+            var requetURL = $@"https://localhost:7011/api/Account/create";
+            var reponse = _client.PostAsJsonAsync(requetURL, acc).Result;
+            if (reponse.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
             }
-            var accounts = _db.Accounts.ToList();
-            return View(accounts);
+            else
+            {
+                return BadRequest();
+            }
         }
         public IActionResult Edit(string username)
         {
-            try 
-            {
-                var account = _db.Accounts.Find(username);
-                return View(account);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/Account/get-by-id?id={username}";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Account>(reponse);
+            return View(data);
 
         }
         [HttpPost]
@@ -109,63 +132,44 @@ namespace OnTap_Net104.Controllers
         {
             try
             {
-                var oldAccount = _db.Accounts.Find(account.Username);
-                if (oldAccount != null)
+                var requetURL = "https://localhost:7011/api/Account/update";
+                var reponse = _client.PutAsJsonAsync(requetURL, account).Result;
+                if (reponse.IsSuccessStatusCode)
                 {
-                    oldAccount.Password = account.Password;
-                    oldAccount.Phone = account.Phone;
-                    oldAccount.Address = account.Address;
-                    _db.Accounts.Update(oldAccount);
-                    _db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                else
-                {
-                    Content("Không tìm thấy tài khoản");
-                    return View();
-                }
+                return BadRequest();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+                return BadRequest();
             }
+
         }
+
+
         public IActionResult Delete(string username)
         {
             try
             {
-                var account = _db.Accounts.Find(username);
-                if (account != null)
-                {
-                    _db.Accounts.Remove(account);
-                    _db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    Content("Không tìm thấy tài khoản");
-                    return View();
-                }
+                var requetURL = $@"https://localhost:7011/api/Account/delete?username={username}";
+                var reponse = _client.DeleteAsync(requetURL).Result;
+                return RedirectToAction("Index");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+                return BadRequest();
             }
         }
+
         public IActionResult Details(string username)
         {
-            try
-            {
-                var account = _db.Accounts.Find(username);
-                return View(account);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/Account/get-by-id?id={username}";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Account>(reponse);
+            return View(data);
         }
     }
 }
