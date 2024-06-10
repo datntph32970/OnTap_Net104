@@ -5,9 +5,9 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppView", "OnTap_Net104\AppView.csproj", "{FCC39F64-0164-415E-8737-5278C1F70D29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAPI", "AppAPI\AppAPI.csproj", "{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAPI", "AppAPI\AppAPI.csproj", "{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppData", "AppData\AppData.csproj", "{EE0E63D1-A942-439A-AE20-DD4173E6C35A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppData", "AppData\AppData.csproj", "{210EE703-4DDF-44B4-A09D-19A17804E2D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{512FEDF4-C452-4AE7-BD86-D46BEB15F1E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE0E63D1-A942-439A-AE20-DD4173E6C35A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE0E63D1-A942-439A-AE20-DD4173E6C35A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE0E63D1-A942-439A-AE20-DD4173E6C35A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE0E63D1-A942-439A-AE20-DD4173E6C35A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{210EE703-4DDF-44B4-A09D-19A17804E2D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{210EE703-4DDF-44B4-A09D-19A17804E2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{210EE703-4DDF-44B4-A09D-19A17804E2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{210EE703-4DDF-44B4-A09D-19A17804E2D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
