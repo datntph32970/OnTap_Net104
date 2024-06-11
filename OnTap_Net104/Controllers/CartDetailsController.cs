@@ -166,40 +166,6 @@ namespace OnTap_Net104.Controllers
                 throw;
             }
         }
-        //[HttpPost]
-        //public IActionResult MuaLai(string idBill)
-        //{
-        //    try
-        //    {
-        //        var listBillDetailMuaLai = _db.BillDetails.Where(a => a.BillId == idBill).ToList();
-
-        //        List<CartDetail> listProductMuaLai = new List<CartDetail>();
-
-
-        //        foreach (var item in listBillDetailMuaLai)
-        //        {
-        //            var cartDetail = new CartDetail();
-        //            cartDetail.Id = Guid.NewGuid();
-        //            cartDetail.CartID = HttpContext.Session.GetString("currentUsername");
-        //            cartDetail.ProductId = item.ProductId;
-        //            cartDetail.Quantity = item.Quantity;
-
-        //            cartDetail.Status = false;
-
-        //            listProductMuaLai.Add(cartDetail);
-        //        }
-
-        //        var a = JsonConvert.SerializeObject(listProductMuaLai);
-        //        HttpContext.Session.SetString("listProductMuaLai", a);
-        //        return RedirectToAction("View_MuaLai");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.InnerException.Message, e.Message);
-        //        throw;
-        //    }
-
-        //}
         [HttpPost]
         public IActionResult MuaLai(string idBill)
         {
@@ -235,37 +201,30 @@ namespace OnTap_Net104.Controllers
             return RedirectToAction("Index");
         }
 
-        //[HttpPost]
-        //public IActionResult Edit(Guid id, int Quantity, bool Status)
-        //{
-        //    try
-        //    {
-        //        var cartDetail_id = $@"https://localhost:7011/api/CartDetail/get-by-id?id={id}";
-        //        if (cartDetail_id == null)
-        //        {
-        //            var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
-        //            cartDetail_ = listProductMuaLai.FirstOrDefault(a => a.Id == id);
-        //            cartDetail_db.Quantity = Quantity;
-        //            cartDetail_db.Status = Status;
+        [HttpPost]
+        public IActionResult Edit(Guid id, int Quantity, bool Status)
+        {
+            try
+            {
+                var cartDetail_id = $@"https://localhost:7011/api/CartDetails/get-by-id?id={id}";
+                var response = _client.GetStringAsync(cartDetail_id).Result;
+                var json = JsonConvert.DeserializeObject<CartDetail>(response);
 
-        //            HttpContext.Session.SetString("listProductMuaLai", JsonConvert.SerializeObject(listProductMuaLai));
-        //        }
-        //        else
-        //        {
-        //            cartDetail_db.Quantity = Quantity;  
-        //            cartDetail_db.Status = Status;
-
-        //            _db.CartDetails.Update(cartDetail_db);
-        //            _db.SaveChanges();
-        //        }
-
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.InnerException.Message, e.Message);
-        //        throw;
-        //    }
-        //}
+                json.Quantity = Quantity;
+                json.Status = Status;
+                var apiUpdate = $@"https://localhost:7011/api/CartDetails/update";
+                var client = _client.PutAsJsonAsync(apiUpdate, json).Result;
+                if (client.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException.Message, e.Message);
+                throw;
+            }
+        }
     }
 }

@@ -41,11 +41,12 @@ namespace AppAPI.Controllers
         {
             try
             {
-                var cartdtUpdate = _db.CartDetails.Find(cartdt);
+                var cartdtUpdate = _db.CartDetails.Find(cartdt.Id);
                 cartdtUpdate.CartID = cartdt.CartID;
                 cartdtUpdate.Quantity = cartdt.Quantity;
                 cartdtUpdate.Status = cartdt.Status;
-                _db.CartDetails.Update(cartdt);
+
+                _db.CartDetails.Update(cartdtUpdate);
                 _db.SaveChanges();
 
                 return Ok();
