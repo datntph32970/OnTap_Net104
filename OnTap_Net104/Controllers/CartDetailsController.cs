@@ -1,32 +1,113 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OnTap_Net104.Models;
+using System.Text;
 
 namespace OnTap_Net104.Controllers
 {
     public class CartDetailsController : Controller
     {
+        HttpClient _client;
         AppDbContext _db;
         public CartDetailsController()
         {
+            _client = new HttpClient();
             _db = new AppDbContext();
         }
         public IActionResult Index(string id)
         {
-            
-
-            if (id == null)
+            if (HttpContext.Session.GetString("currentUsername") == null)
             {
-                var username = HttpContext.Session.GetString("currentUsername");
-                var cartDetails = _db.CartDetails.Where(a => a.CartID == username).ToList();
-                return View(cartDetails);
+                return RedirectToAction("Login", "Account");
             }
             else
             {
-                var cartDetails = _db.CartDetails.Where(a => a.CartID == id).ToList();
-                return View(cartDetails);
+                var requesURL = $@"https://localhost:7011/api/CartDetail/get-all";
+                var cartDetails = _client.GetStringAsync(requesURL).Result;
+                if (id == null)
+                {
+                    var data = JsonConvert.DeserializeObject<List<CartDetail>>(cartDetails);
+                    return View(data);
+                }
+                else
+                {
+                    var data = JsonConvert.DeserializeObject<List<CartDetail>>(cartDetails).Where(a => a.CartID == id).ToList();
+                    return View(data);
+                }
             }
         }
+
+        //[HttpPost]
+        //public IActionResult Create(Guid ProductID, int Quantity)
+        //{
+        //    try
+        //    {
+        //        var username = HttpContext.Session.GetString("currentUsername");
+        //        if (username == null)
+        //        {
+        //            return Json("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
+        //        }
+
+        //        var requesURL = $@"https://localhost:7011/api/CartDetail/get-all";
+        //        var cart = _client.GetStringAsync(requesURL).Result;
+        //        var cart_dt = JsonConvert.DeserializeObject<List<CartDetail>>(cart).Where(a => a.ProductId == ProductID &&  a.CartID == (HttpContext.Session.GetString("currentUsername"))).ToList();
+
+        //        var productURL = $@"https://localhost:7011/api/Product/get-by-id?id={ProductID}";
+        //        var productRes = _client.GetStringAsync(productURL).Result;
+        //        var products = JsonConvert.DeserializeObject<Product>(productRes);
+        //        if (cart_dt != null)
+        //        {
+        //            try
+        //            {
+
+
+        //                foreach (var item in cart_dt)
+        //                {
+        //                    item.Quantity += Quantity;
+        //                    if (Quantity < 1 || item.Quantity > products.Quantity)
+        //                    {
+        //                        return Json("Số lượng trong giỏ hàng không thể quá số lượng trong kho!");
+        //                    }
+        //                    var updateURL = $@"https://localhost:7011/api/CartDetail/update";
+        //                    var updateResponse = _client.PutAsJsonAsync(updateURL, cart_dt).Result;
+        //                    return RedirectToAction("Index");
+        //                }
+
+        //            }
+        //            catch (Exception)
+        //            {
+        //                return Json("Có lỗi xảy ra khi cập nhật giỏ hàng!");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if ((Quantity < 1) || Quantity > products.Quantity)
+        //            {
+        //                return Json("Số lượng vượt quá số lượng trong kho");
+        //            }
+        //            var cartDetail = new CartDetail();
+        //            cartDetail.Id = Guid.NewGuid();
+        //            cartDetail.CartID = username;
+        //            cartDetail.ProductId = ProductID;
+        //            cartDetail.Quantity = Quantity;
+        //            cartDetail.Status = false;
+
+        //            var createUrl = $@"https://localhost:7011/api/CartDetail/create";
+        //            var createContent = new StringContent(JsonConvert.SerializeObject(cartDetail), Encoding.UTF8, "application/json");
+        //            var createResponse = _client.PostAsync(createUrl, createContent);
+        //            return RedirectToAction("Index");
+        //        }
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        // Log the error properly
+        //        // Consider using a logging library such as Serilog, NLog, etc.
+        //        // Log.Error(e, "Error in Create method");
+
+        //        return StatusCode(500, "Đã có lỗi xảy ra, vui lòng thử lại sau.");
+        //    }
+        //}
         [HttpPost]
         public IActionResult Create(Guid ProductID, int Quatity)
         {
@@ -39,7 +120,7 @@ namespace OnTap_Net104.Controllers
                 }
                 else
                 {
-                    
+
                     var existCartDetail = _db.CartDetails.Where(a => a.CartID == username && a.ProductId == ProductID).FirstOrDefault();
                     if (existCartDetail != null)
                     {
@@ -85,40 +166,40 @@ namespace OnTap_Net104.Controllers
                 throw;
             }
         }
-        [HttpPost]
-        public IActionResult MuaLai(string idBill)
-        {
-            try
-            {
-                var listBillDetailMuaLai = _db.BillDetails.Where(a => a.BillId == idBill).ToList();
+        //[HttpPost]
+        //public IActionResult MuaLai(string idBill)
+        //{
+        //    try
+        //    {
+        //        var listBillDetailMuaLai = _db.BillDetails.Where(a => a.BillId == idBill).ToList();
 
-                List<CartDetail> listProductMuaLai = new List<CartDetail>();
+        //        List<CartDetail> listProductMuaLai = new List<CartDetail>();
 
 
-                foreach (var item in listBillDetailMuaLai)
-                {
-                    var cartDetail = new CartDetail();
-                    cartDetail.Id = Guid.NewGuid();
-                    cartDetail.CartID = HttpContext.Session.GetString("currentUsername");
-                    cartDetail.ProductId = item.ProductId;
-                    cartDetail.Quantity = item.Quantity;
+        //        foreach (var item in listBillDetailMuaLai)
+        //        {
+        //            var cartDetail = new CartDetail();
+        //            cartDetail.Id = Guid.NewGuid();
+        //            cartDetail.CartID = HttpContext.Session.GetString("currentUsername");
+        //            cartDetail.ProductId = item.ProductId;
+        //            cartDetail.Quantity = item.Quantity;
 
-                    cartDetail.Status = false;
+        //            cartDetail.Status = false;
 
-                    listProductMuaLai.Add(cartDetail);
-                }
+        //            listProductMuaLai.Add(cartDetail);
+        //        }
 
-                var a = JsonConvert.SerializeObject(listProductMuaLai);
-                HttpContext.Session.SetString("listProductMuaLai", a);
-                return RedirectToAction("View_MuaLai");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+        //        var a = JsonConvert.SerializeObject(listProductMuaLai);
+        //        HttpContext.Session.SetString("listProductMuaLai", a);
+        //        return RedirectToAction("View_MuaLai");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.InnerException.Message, e.Message);
+        //        throw;
+        //    }
 
-        }
+        //}
         public IActionResult View_MuaLai()
         {
             var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
@@ -127,56 +208,49 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Details(Guid id)
         {
-            var cartDetail = _db.CartDetails.Find(id);
-            return View(cartDetail);
+            var requetURL = $@"https://localhost:7011/api/CartDetail/Details?id={id}";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<CartDetail>(reponse);
+            return View(data);
         }
         public IActionResult Delete(Guid id, int Quatity)
         {
-            try
-            {
-                var cartDetail = _db.CartDetails.Find(id);
-                _db.CartDetails.Remove(cartDetail);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
+            var requetURL = $@"https://localhost:7011/api/CartDetail/delete?id={id}";
+            var reponse = _client.DeleteAsync(requetURL).Result;
+            return RedirectToAction("Index");
         }
 
-        [HttpPost]
-        public IActionResult Edit(Guid id, int Quantity, bool Status)
-        {
-            try
-            {
-                var cartDetail_db = _db.CartDetails.Find(id);
-                if (cartDetail_db == null)
-                {
-                    var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
-                    cartDetail_db = listProductMuaLai.FirstOrDefault(a => a.Id == id);
-                    cartDetail_db.Quantity = Quantity;
-                    cartDetail_db.Status = Status;
+        //[HttpPost]
+        //public IActionResult Edit(Guid id, int Quantity, bool Status)
+        //{
+        //    try
+        //    {
+        //        var cartDetail_id = $@"https://localhost:7011/api/CartDetail/get-by-id?id={id}";
+        //        if (cartDetail_id == null)
+        //        {
+        //            var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
+        //            cartDetail_ = listProductMuaLai.FirstOrDefault(a => a.Id == id);
+        //            cartDetail_db.Quantity = Quantity;
+        //            cartDetail_db.Status = Status;
 
-                    HttpContext.Session.SetString("listProductMuaLai", JsonConvert.SerializeObject(listProductMuaLai));
-                }
-                else
-                {
-                    cartDetail_db.Quantity = Quantity;
-                    cartDetail_db.Status = Status;
+        //            HttpContext.Session.SetString("listProductMuaLai", JsonConvert.SerializeObject(listProductMuaLai));
+        //        }
+        //        else
+        //        {
+        //            cartDetail_db.Quantity = Quantity;  
+        //            cartDetail_db.Status = Status;
 
-                    _db.CartDetails.Update(cartDetail_db);
-                    _db.SaveChanges();
-                }
+        //            _db.CartDetails.Update(cartDetail_db);
+        //            _db.SaveChanges();
+        //        }
 
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
-        }
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.InnerException.Message, e.Message);
+        //        throw;
+        //    }
+        //}
     }
 }

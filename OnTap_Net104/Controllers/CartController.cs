@@ -1,50 +1,45 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OnTap_Net104.Models;
+﻿using AppData.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace OnTap_Net104.Controllers
 {
     public class CartController : Controller
     {
-        AppDbContext _db;
+        HttpClient _client;
         public CartController()
         {
-            _db = new AppDbContext();
+            _client = new HttpClient();
         }
         public IActionResult Index()
         {
-            var carts = _db.Carts.ToList();
-            return View(carts);
+            var requetURL = $@"https://localhost:7011/api/Cart/get-all";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<List<Cart>>(reponse);
+            return View(data);
         }
 
         public IActionResult Edit(string username)
         {
-            var cart = _db.Carts.Find(username);
-            return View(cart);
+            var requetURL = $@"https://localhost:7011/api/Cart/get-by-id?id={username}";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Cart>(reponse);
+            return View(data);
         }
         [HttpPost]
         public IActionResult Edit(Cart cart)
         {
-            try
-            {
-                var cart_db = _db.Carts.Find(cart.Username);
+            var requetURL = $@"https://localhost:7011/api/Cart/Edit";
+            var reponse = _client.PutAsJsonAsync(requetURL, cart).Result;
+            return RedirectToAction("Index");
 
-                cart_db.Status = cart.Status;
-                cart_db.Description = cart.Description;
-                
-                _db.Carts.Update(cart_db);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
-            }
         }
         public IActionResult Details(string username)
         {
-            var cart = _db.Carts.Find(username);
-            return View(cart);
+            var requetURL = $@"https://localhost:7011/api/Cart/Details?id={username}";
+            var reponse = _client.GetStringAsync(requetURL).Result;
+            var data = JsonConvert.DeserializeObject<Product>(reponse);
+            return View(data);
         }
     }
 }
