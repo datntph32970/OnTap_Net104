@@ -22,7 +22,7 @@ namespace OnTap_Net104.Controllers
             }
             var listBill = client.GetStringAsync("APIBill/get-all").Result;
             var data = JsonConvert.DeserializeObject<List<Bill>>(listBill);
-            return View(data);
+            return View(data.OrderByDescending(a=>a.CreateDate));
             
         }
         public IActionResult Index_ViewKhachHang(string username)
@@ -33,7 +33,7 @@ namespace OnTap_Net104.Controllers
             }
             var listBill = client.GetStringAsync("APIBill/get-all").Result;
             var data = JsonConvert.DeserializeObject<List<Bill>>(listBill).Where(a => a.Username == HttpContext.Session.GetString("currentUsername"));
-            return View(data);
+            return View(data.OrderByDescending(a => a.CreateDate));
         }
         [HttpPost]
         public IActionResult Create()
@@ -65,7 +65,7 @@ namespace OnTap_Net104.Controllers
                 bill.Username = HttpContext.Session.GetString("currentUsername");
                 bill.TotalBill = 0;
                 bill.Status = 0;
-                bill.CreateDate = new DateTime();
+                bill.CreateDate = DateTime.Now;
 
                 var json = JsonConvert.SerializeObject(bill);
 

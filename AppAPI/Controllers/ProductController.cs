@@ -64,8 +64,9 @@ namespace AppAPI.Controllers
                 _context.SaveChanges();
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e.InnerException.Message,e.Message);
                 return BadRequest(400);
             }
         }

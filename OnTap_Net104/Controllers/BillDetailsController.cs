@@ -60,7 +60,7 @@ namespace OnTap_Net104.Controllers
                         Status = 0
                     };
 
-                    var addBillDetail = client.PostAsJsonAsync("BillDetail/create", newBillDetail).Result;
+                    var addBillDetail = client.PostAsJsonAsync("APIBillDetail/create", newBillDetail).Result;
                     if (addBillDetail.IsSuccessStatusCode)
                     {
                         var productUpdate = client.GetStringAsync("SanPham/get-by-id?id=" + item.ProductId).Result;
@@ -70,13 +70,23 @@ namespace OnTap_Net104.Controllers
                         var respone = client.PutAsJsonAsync("SanPham/Edit", jsonProductUpdate);
                         if (respone.Result.IsSuccessStatusCode)
                         {
-                            var updateTotalBill = client.GetStringAsync("Bill/get-by-id?id=" + billID).Result;
+                            var updateTotalBill = client.GetStringAsync("APIBill/get-by-id?id=" + billID).Result;
                             var jsonUpdateTotalBill = JsonConvert.DeserializeObject<Bill>(updateTotalBill);
 
                             jsonUpdateTotalBill.TotalBill += newBillDetail.ProductPrice * newBillDetail.Quantity;
-                            client.PutAsJsonAsync("APIBill/update", jsonUpdateTotalBill);
 
-                            var removeCartDetail = client.DeleteAsync("CartDetails/delete?id=" + item.Id);
+                            var a = client.PutAsJsonAsync("APIBill/update", jsonUpdateTotalBill);
+
+                            if (a.Result.IsSuccessStatusCode)
+                            {
+                                Console.WriteLine("a");
+                            }
+
+                            var removeCartDetail = client.DeleteAsync("CartDetails/delete?id=" + item.Id).Result;
+                            if(removeCartDetail.IsSuccessStatusCode)
+                            {
+                                continue;
+                            }
                         }
                     }
                 }
