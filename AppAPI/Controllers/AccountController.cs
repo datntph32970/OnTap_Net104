@@ -1,6 +1,7 @@
 ﻿using AppData.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppAPI.Controllers
 {
@@ -75,6 +76,57 @@ namespace AppAPI.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
+                return BadRequest();
+            }
+        }
+        [HttpPost("Sign-up")]
+        public IActionResult SignUp(Account account)
+        {
+            try
+            {
+                var ac = new Account();
+                ac.Username = "LeeNgoc150";
+                ac.Password = "LeNgoc1509";
+                ac.Phone = "0367385226";
+                ac.Address = "HaNoi";
+                _db.Accounts.Add(account);
+                _db.SaveChanges();
+                return Ok();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
+
+        // POST api/<AccountController>
+        [HttpGet("Sign-in")]
+        public IActionResult SignIn(string username, string password)
+        {
+            try
+            {
+                _db.Accounts.FirstOrDefault(a => a.Username == username && a.Password == password);
+                return Ok();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
+
+        //PUT api/<AccountController>/5
+        [HttpGet("Log-Out")]
+        public IActionResult LogOut()
+        {
+            try
+            {
+                HttpContext.Session.Clear();
+                return Ok();
+            }
+            catch (Exception)
+            {
                 return BadRequest();
             }
         }

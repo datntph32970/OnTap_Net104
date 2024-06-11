@@ -24,34 +24,17 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult Login(string username, string password)
         {
-            try
+            string requestURL = $"https://localhost:7011/api/Account/Sign-in?username={username}&password={password}";
+            var respone = _client.GetAsync(requestURL);
+            if (respone.Result.IsSuccessStatusCode)
             {
-                if (username == null && password == null) 
-                {
-                    return View();
-                }
-                else
-                {
-                    var user = _db.Accounts.Find(username);
-                    if (user != null && user.Password == password)
-                    {
-                        HttpContext.Session.SetString("currentUsername", user.Username);
-
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "Sai tên đăng nhập hoặc mật khẩu";
-                        return View();
-                    }
-                }
+                HttpContext.Session.SetString("currentUsername", username);
+                return RedirectToAction("Index", "Product");
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-               return BadRequest();
+                return View();
             }
-
         }
         public IActionResult SignUp()
         {
@@ -62,25 +45,21 @@ namespace OnTap_Net104.Controllers
         {
             try
             {
-                var oldAccount = _db.Accounts.Find(account.Username);
-                if (oldAccount == null)
+                string requestURL = $"https://localhost:7011/api/Account/Sign-up";
+                var respone = _client.PostAsJsonAsync(requestURL, account);
+                if (respone.Result.IsSuccessStatusCode)
                 {
-                    _db.Accounts.Add(account);
-                    _db.Carts.Add(new Cart { Username = account.Username });
-                    _db.SaveChanges();
                     return RedirectToAction("Login");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Tài khoản đã tồn tại");
                     return View();
                 }
             }
-
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.InnerException.Message, e.Message);
-                throw;
+
+                return BadRequest();
             }
 
         }
