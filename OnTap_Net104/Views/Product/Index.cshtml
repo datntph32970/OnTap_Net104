@@ -61,7 +61,7 @@
                 @Html.ActionLink("Delete", "Delete", new {  id=item.Id })
             </td>
                 <td>
-                    <form action="@Url.Action("AddToCart", "Product")" method="post">
+                    <form asp-action="AddToCart" asp-controller="Product" method="post">
                         <div class="form-group">
                             <label for="quantity-@item.Id">Số lượng:</label>
                             <input type="number" id="quantity-@item.Id" name="quantity" min="1" value="1" class="form-control" />
