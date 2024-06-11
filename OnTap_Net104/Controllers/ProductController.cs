@@ -93,7 +93,7 @@ namespace OnTap_Net104.Controllers
                 }
 
                 // Lấy ra từ danh sách cartDetails của user đang đăng nhập xem có sản phẩm nào trùng id không?
-                var allCartItem = _context.CartDetails.FirstOrDefault(p => p.Username == check && p.ProductId == id);
+                var allCartItem = _context.CartDetails.FirstOrDefault(p => p.CartID == check && p.ProductId == id);
 
                 // Nếu sản phẩm chưa tồn tại trong giỏ hàng, tạo mới một CartDetails
                 if (allCartItem == null)
@@ -106,7 +106,6 @@ namespace OnTap_Net104.Controllers
                         Quantity = quantity,
                         ProductId = id,
                         CartID = check,
-                        Username = check,
                         Status = true
                     };
                     _context.CartDetails.Add(details);

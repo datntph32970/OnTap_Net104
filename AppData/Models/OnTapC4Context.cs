@@ -17,6 +17,7 @@ namespace AppData.Models
 
         public OnTapC4Context(DbContextOptions options) : base(options)
         {
+
         }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Bill> Bills { get; set; }

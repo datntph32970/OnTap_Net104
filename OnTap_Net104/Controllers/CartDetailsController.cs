@@ -22,7 +22,7 @@ namespace OnTap_Net104.Controllers
             }
             else
             {
-                var requesURL = $@"https://localhost:7011/api/CartDetail/get-all";
+                var requesURL = $@"https://localhost:7011/api/CartDetails/get-all";
                 var cartDetails = _client.GetStringAsync(requesURL).Result;
                 if (id == null)
                 {
