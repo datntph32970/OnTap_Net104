@@ -200,6 +200,21 @@ namespace OnTap_Net104.Controllers
         //    }
 
         //}
+        [HttpPost]
+        public IActionResult MuaLai(string idBill)
+        {
+            string requestURL = $"https://localhost:7011/api/Bill/Mua-lai?id={idBill}";
+            var respone = _client.GetAsync(requestURL);
+            if (respone.Result.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
         public IActionResult View_MuaLai()
         {
             var listProductMuaLai = JsonConvert.DeserializeObject<List<CartDetail>>(HttpContext.Session.GetString("listProductMuaLai"));
