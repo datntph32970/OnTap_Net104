@@ -169,7 +169,7 @@ namespace OnTap_Net104.Controllers
         [HttpPost]
         public IActionResult MuaLai(string idBill)
         {
-            string requestURL = $"https://localhost:7011/api/Bill/Mua-lai?id={idBill}";
+            string requestURL = $"https://localhost:7011/api/APIBill/Mua-lai?id={idBill}";
             var respone = _client.GetAsync(requestURL);
             if (respone.Result.IsSuccessStatusCode)
             {
