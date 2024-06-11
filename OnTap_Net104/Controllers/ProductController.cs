@@ -1,19 +1,18 @@
-﻿using AppData.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-
+using OnTap_Net104.Models;
 using System.Net.WebSockets;
 namespace OnTap_Net104.Controllers
 {
     public class ProductController : Controller
     {
-        OnTapC4Context _context;
+      
         HttpClient _clitent;
 
         public ProductController()
         {
             _clitent = new HttpClient();
-            _context = new OnTapC4Context();
+             
         }
         public IActionResult Index()
         {
@@ -72,53 +71,7 @@ namespace OnTap_Net104.Controllers
         }
         public IActionResult AddToCart(Guid id, int quantity)
         {
-            // Kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa thì chuyển hướng đến trang đăng nhập
-            var check = HttpContext.Session.GetString("username");
-            if (string.IsNullOrEmpty(check))
-            {
-                return RedirectToAction("Login", "Account"); // Chuyển hướng về trang Login
-            }
-            else
-            {
-                var product = _context.Products.FirstOrDefault(p => p.Id == id);
-                if (quantity <= 0)
-                {
-                    TempData[$"Error_{id}"] = "Số lượng sản phẩm không hợp lệ.";
-                    return RedirectToAction("Index");
-                }
-                if (product.Quantity < quantity)
-                {
-                    TempData[$"Error_{id}"] = "Số lượng sản phẩm không đủ để thêm vào giỏ hàng.";
-                    return RedirectToAction("Index");
-                }
-
-                // Lấy ra từ danh sách cartDetails của user đang đăng nhập xem có sản phẩm nào trùng id không?
-                var allCartItem = _context.CartDetails.FirstOrDefault(p => p.CartID == check && p.ProductId == id);
-
-                // Nếu sản phẩm chưa tồn tại trong giỏ hàng, tạo mới một CartDetails
-                if (allCartItem == null)
-                {
-
-
-                    CartDetail details = new CartDetail()
-                    {
-                        Id = Guid.NewGuid(),
-                        Quantity = quantity,
-                        ProductId = id,
-                        CartID = check,
-                        Status = true
-                    };
-                    _context.CartDetails.Add(details);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng
-                    allCartItem.Quantity = allCartItem.Quantity + quantity;
-                    _context.CartDetails.Update(allCartItem);
-                    _context.SaveChanges();
-                }
-            }
+           
             return RedirectToAction("Index", "Product");
         }
     }
