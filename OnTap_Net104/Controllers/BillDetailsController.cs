@@ -56,6 +56,7 @@ namespace OnTap_Net104.Controllers
                         BillId = billID,
                         ProductId = item.ProductId,
                         ProductPrice = jsonProduct.Price,
+                        TransportFee = item.TransportFee,
                         Quantity = item.Quantity,
                         Status = 0
                     };
@@ -73,7 +74,7 @@ namespace OnTap_Net104.Controllers
                             var updateTotalBill = client.GetStringAsync("APIBill/get-by-id?id=" + billID).Result;
                             var jsonUpdateTotalBill = JsonConvert.DeserializeObject<Bill>(updateTotalBill);
 
-                            jsonUpdateTotalBill.TotalBill += newBillDetail.ProductPrice * newBillDetail.Quantity;
+                            jsonUpdateTotalBill.TotalBill += (newBillDetail.ProductPrice * newBillDetail.Quantity)+newBillDetail.TransportFee;
 
                             var a = client.PutAsJsonAsync("APIBill/update", jsonUpdateTotalBill);
 

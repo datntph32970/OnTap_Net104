@@ -23,6 +23,10 @@
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.TransportFee)
+            </th>
+
+            <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
@@ -46,6 +50,10 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransportFee)
+            </td>
+
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>

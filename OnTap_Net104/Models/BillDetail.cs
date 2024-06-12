@@ -6,6 +6,7 @@
         public string BillId { get; set; }
         public Guid ProductId { get; set; }
         public decimal ProductPrice { get; set; } // Giá tại thời điểm mua
+        public decimal TransportFee { get; set; }
         public int Quantity { get; set; }
         public int Status { get; set; }
         public virtual Bill? Bill { get; set; }

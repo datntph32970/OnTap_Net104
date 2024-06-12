@@ -79,6 +79,43 @@ namespace AppAPI.Controllers
             }
            
         }
-
+        [HttpGet("Mua-lai")]
+        public IActionResult MuaLai(string id)
+        {
+            try
+            {
+                var billl = _db.Bills.Find(id);
+                var ml = _db.BillDetails.Where(a => a.BillId == id).ToList();
+                foreach (var item in ml)
+                {
+                    var ck = _db.CartDetails.FirstOrDefault(a => a.ProductId == item.ProductId && a.CartID == billl.Username);
+                    if (ck == null)
+                    {
+                        var cartdt = new CartDetail()
+                        {
+                            Id = Guid.NewGuid(),
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            Status = true,
+                            TransportFee = 0,
+                            CartID = billl.Username,
+                        };
+                        _db.CartDetails.Add(cartdt);
+                        _db.SaveChanges();
+                    }
+                    else
+                    {
+                        ck.Quantity += item.Quantity;
+                        _db.CartDetails.Update(ck);
+                        _db.SaveChanges();
+                    }
+                }
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

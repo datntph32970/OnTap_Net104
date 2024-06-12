@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OnTap_Net104.Models;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace OnTap_Net104.Controllers
@@ -37,77 +38,7 @@ namespace OnTap_Net104.Controllers
             }
         }
 
-        //[HttpPost]
-        //public IActionResult Create(Guid ProductID, int Quantity)
-        //{
-        //    try
-        //    {
-        //        var username = HttpContext.Session.GetString("currentUsername");
-        //        if (username == null)
-        //        {
-        //            return Json("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-        //        }
 
-        //        var requesURL = $@"https://localhost:7011/api/CartDetail/get-all";
-        //        var cart = _client.GetStringAsync(requesURL).Result;
-        //        var cart_dt = JsonConvert.DeserializeObject<List<CartDetail>>(cart).Where(a => a.ProductId == ProductID &&  a.CartID == (HttpContext.Session.GetString("currentUsername"))).ToList();
-
-        //        var productURL = $@"https://localhost:7011/api/Product/get-by-id?id={ProductID}";
-        //        var productRes = _client.GetStringAsync(productURL).Result;
-        //        var products = JsonConvert.DeserializeObject<Product>(productRes);
-        //        if (cart_dt != null)
-        //        {
-        //            try
-        //            {
-
-
-        //                foreach (var item in cart_dt)
-        //                {
-        //                    item.Quantity += Quantity;
-        //                    if (Quantity < 1 || item.Quantity > products.Quantity)
-        //                    {
-        //                        return Json("Số lượng trong giỏ hàng không thể quá số lượng trong kho!");
-        //                    }
-        //                    var updateURL = $@"https://localhost:7011/api/CartDetail/update";
-        //                    var updateResponse = _client.PutAsJsonAsync(updateURL, cart_dt).Result;
-        //                    return RedirectToAction("Index");
-        //                }
-
-        //            }
-        //            catch (Exception)
-        //            {
-        //                return Json("Có lỗi xảy ra khi cập nhật giỏ hàng!");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if ((Quantity < 1) || Quantity > products.Quantity)
-        //            {
-        //                return Json("Số lượng vượt quá số lượng trong kho");
-        //            }
-        //            var cartDetail = new CartDetail();
-        //            cartDetail.Id = Guid.NewGuid();
-        //            cartDetail.CartID = username;
-        //            cartDetail.ProductId = ProductID;
-        //            cartDetail.Quantity = Quantity;
-        //            cartDetail.Status = false;
-
-        //            var createUrl = $@"https://localhost:7011/api/CartDetail/create";
-        //            var createContent = new StringContent(JsonConvert.SerializeObject(cartDetail), Encoding.UTF8, "application/json");
-        //            var createResponse = _client.PostAsync(createUrl, createContent);
-        //            return RedirectToAction("Index");
-        //        }
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        // Log the error properly
-        //        // Consider using a logging library such as Serilog, NLog, etc.
-        //        // Log.Error(e, "Error in Create method");
-
-        //        return StatusCode(500, "Đã có lỗi xảy ra, vui lòng thử lại sau.");
-        //    }
-        //}
         [HttpPost]
         public IActionResult Create(Guid ProductID, int Quatity)
         {
@@ -151,6 +82,7 @@ namespace OnTap_Net104.Controllers
                         cartDetail.Id = Guid.NewGuid();
                         cartDetail.CartID = username;
                         cartDetail.ProductId = ProductID;
+                        cartDetail.TransportFee = 0;
                         cartDetail.Quantity = Quatity;
                         cartDetail.Status = false;
 
@@ -194,11 +126,16 @@ namespace OnTap_Net104.Controllers
             var data = JsonConvert.DeserializeObject<CartDetail>(reponse);
             return View(data);
         }
-        public IActionResult Delete(Guid id, int Quatity)
+        public IActionResult Delete(Guid id)
         {
-            var requetURL = $@"https://localhost:7011/api/CartDetail/delete?id={id}";
+            var requetURL = $"https://localhost:7011/api/CartDetails/delete?id={id}";
             var reponse = _client.DeleteAsync(requetURL).Result;
+            if (reponse.IsSuccessStatusCode)
+            {
+
             return RedirectToAction("Index");
+            }
+            return BadRequest();
         }
 
         [HttpPost]
@@ -224,6 +161,61 @@ namespace OnTap_Net104.Controllers
             {
                 Console.WriteLine(e.InnerException.Message, e.Message);
                 throw;
+            }
+        }
+
+
+        public async Task<decimal> GetTotalTransportFee(int serviceId, decimal insuranceValue, int toDistrictId, string toWardCode)
+        {
+            try
+            {
+                var INTinsuranceValue = Convert.ToInt32(insuranceValue);
+                string baseUrl = $"https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee?service_id={serviceId}&insurance_value={INTinsuranceValue}&from_district_id=3440&to_district_id={toDistrictId}&to_ward_code={toWardCode}&weight=1000&length=10&width=10&height=10";
+               
+
+                var a = _client.GetAsync(baseUrl).Result;
+                var b = a.Content.ReadAsStringAsync().Result;
+
+                var result = JsonConvert.DeserializeObject<dynamic>(b);
+
+                decimal totalTransportFee = result.data.total;
+
+                return totalTransportFee;
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e.InnerException.Message, e.Message);
+                throw;
+            }
+        }
+        public IActionResult UpdateTransportFeeForAllCartDetails(int serviceId, int toDistrictId, string toWardCode)
+        {
+            try
+            {
+                var cartDetails = _client.GetStringAsync("https://localhost:7011/api/CartDetails/get-all").Result;
+                var datacartDetails = JsonConvert.DeserializeObject<List<CartDetail>>(cartDetails);
+
+                _client.DefaultRequestHeaders.Add("token", "c5a07264-26a0-11ef-ad6a-e6aec6d1ae72");
+                _client.DefaultRequestHeaders.Add("shop_id", "5123377");
+
+                foreach (var cartDetail in datacartDetails)
+                {
+                    var product = _client.GetStringAsync($"https://localhost:7011/api/SanPham/get-by-id?id={cartDetail.ProductId}").Result;
+                    var productData = JsonConvert.DeserializeObject<Product>(product);
+                    var insuranceValue = productData.Price * cartDetail.Quantity;
+                    var transportFee = GetTotalTransportFee(serviceId, insuranceValue, toDistrictId, toWardCode).Result;
+                    cartDetail.TransportFee = transportFee;
+                    _db.CartDetails.Update(cartDetail);
+                    Thread.Sleep(500);
+                }
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
             }
         }
     }

@@ -57,6 +57,10 @@ namespace OnTap_Net104.Controllers
                         {
                             return Json("Có sản phẩm vượt quá số lượng vui lòng thử lại!");
                         }
+                        else if(item.TransportFee <= 0)
+                        {
+                            return Json("Yêu cầu cần có địa điểm giao hàng");
+                        }
                     }
                 }
 
