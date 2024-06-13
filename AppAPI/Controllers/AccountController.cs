@@ -84,11 +84,14 @@ namespace AppAPI.Controllers
         {
             try
             {
-                var ac = new Account();
-                ac.Username = "LeeNgoc150";
-                ac.Password = "LeNgoc1509";
-                ac.Phone = "0367385226";
-                ac.Address = "HaNoi";
+                var gh = new Cart()
+                {
+                    Username = account.Username,
+                    Status = 0,
+                    Description = "",
+                };
+                _db.Carts.Add(gh);
+                
                 _db.Accounts.Add(account);
                 _db.SaveChanges();
                 return Ok();
