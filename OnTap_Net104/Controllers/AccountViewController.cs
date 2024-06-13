@@ -79,7 +79,7 @@ namespace OnTap_Net104.Controllers
                 Username = "thanhdx1234",
                 Password = "thanhdx1234",
                 Phone = "0796000234",
-                Address = "Ha Loi"
+                Address = "Ha Noi"
             };
             return View(account);
         }

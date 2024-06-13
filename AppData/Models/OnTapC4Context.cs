@@ -28,7 +28,7 @@ namespace AppData.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=ACER\\SQLEXPRESS;Database=OnTapC4;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
+            optionsBuilder.UseSqlServer("Server=ADMIN;Database=APPC5ASSM;Trusted_Connection=True;TrustServerCertificate=true;Integrated Security=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
